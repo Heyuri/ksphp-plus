@@ -46,7 +46,6 @@
 <header><span class="pagetitle"><a href="{CGIURL}" style="text-decoration: none;">{BBSTITLE}</a></span></header>
 <h1>メッセージ削除モード</h1>
 <form method="post" action="{CGIURL}">
-	<input type="submit" value="　[!]削除実行　" class="btn" />
 	<input type="hidden" name="m" value="ad" />
 	<input type="hidden" name="u" value="{U}" />
 	<input type="hidden" name="v" value="{V}" />
@@ -54,6 +53,7 @@
 	<input type="button" onclick="location.href='#bottom'" accesskey="B" value="▼" class="btn" title="Alt(+Shift)+B">
 </form>
 <form method="post" action="{CGIURL}">
+	<input type="submit" value="　[!]削除実行　" class="btn" />
 	<input type="hidden" name="m" value="ad" />
 	<input type="hidden" name="ad" value="x" />
 	<input type="hidden" name="u" value="{U}" />
@@ -79,7 +79,7 @@
 
 <!-- 暗号化パスワード生成画面 -->
 <patTemplate:tmpl name="setpass">
-<header><span class="pagetitle">{BBSTITLE}</span> - パスワード設定画面<header><br>
+<header><span class="pagetitle">{BBSTITLE}</span> - パスワード設定画面</header><br>
 <form method="post" action="{CGIURL}">
 	<input type="hidden" name="m" value="ad" />
 	<input type="hidden" name="ad" value="ps" />
@@ -117,4 +117,3 @@
 	<a href="{CGIURL}">掲示板</a>
 </form>
 </patTemplate:tmpl>
-
