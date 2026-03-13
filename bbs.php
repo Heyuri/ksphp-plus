@@ -230,7 +230,7 @@ class Webapp {
 
 function tripuse($key) {
     #$tripkey = '#istrip';? // String to be used as password (with #)
-            $key = mb_convert_encoding($key, "SJIS", "UTF-8");	// to, from
+            $key = mb_convert_encoding($key, "SJIS-win", "UTF-8,SJIS-win");	// to, from
     #		$key = '#'.substr($key, strpos($key, '#'));
     
     # Trip
@@ -266,6 +266,8 @@ function tripuse($key) {
     }
     return $trip;
     }
+    
+
 
     /**
      * Form acquisition preprocessing
@@ -1501,9 +1503,9 @@ class Bbs extends Webapp {
         if (strlen ($this->f['i']) > $this->c['MAXMAILLENGTH']) {
             $this->prterror(T('EMAIL_TOO_LONG'));
         }
-        if ($this->f['i']) { ## mod
-            $this->prterror(T('SPAM_KUN')); ## mod
-        } ## mod
+//        if ($this->f['i']) { ## mod
+//            $this->prterror(T('SPAM_KUN')); ## mod
+//        } ## mod
         if (strlen ($this->f['t']) > $this->c['MAXTITLELENGTH']) {
             $this->prterror(T('TITLE_TOO_LONG'));
         }
@@ -1568,6 +1570,211 @@ class Bbs extends Webapp {
 
         return $posterr;
     }
+    
+################
+#post user function by chatGPT 20260310 gikoneko
+################
+
+########## 1 メイン処理
+
+function handleUser(&$message)
+{
+    $user = $message['USER'] ?? '';
+
+    if ($user === '') {
+        $message['USER'] = $this->c['ANONY_NAME'];
+        return;
+    }
+
+    [$name, $trip, $copy] = $this->parseUser($user);
+
+    if ($this->checkAdmin($name, $trip, $copy, $message)) {
+        return;
+    }
+
+    $name = $this->checkAdminFraud($name);
+    $name = $this->protectAdminName($name,$trip,$copy);
+    $name = $this->convertHandle($name);
+
+    $message['USER'] = $this->buildName($name, $trip, $copy);
+}
+
+###########  2 ユーザー解析
+
+function parseUser($user)
+{
+    $trip = '';
+    $copy = '';
+
+    # ◆コピー分解
+    if (strpos($user, '◆') !== false) {
+
+        $parts = explode('◆', $user);
+
+        $name = $parts[0];
+        $copy = implode('◆', array_slice($parts,1));
+
+        return [$name, '', $copy];
+    }
+
+    # 通常トリップ
+    if (($pos = strpos($user,'#')) !== false) {
+
+        $name = substr($user,0,$pos);
+        $tripkey = substr($user,$pos);
+
+        $trip =
+            substr(
+                preg_replace("/\W/",'',crypt($tripkey,'00')),
+                -7
+            ) .
+            $this->tripuse($tripkey);
+
+        return [$name,$trip,''];
+    }
+
+    return [$user,'',''];
+}
+
+############ 3 admin判定
+
+function checkAdmin($name,$trip,$copy,&$message)
+{
+    $adminPost = $this->c['ADMINPOST'] ?? '';
+
+    if (!$adminPost) {
+        return false;
+    }
+
+    # ◆コピーがある場合は管理不可
+    if ($copy !== '') {
+        return false;
+    }
+
+    if (crypt($name,$adminPost) === $adminPost) {
+
+        $adminName = $this->c['ADMINNAME'];
+
+        $message['USER'] =
+            "<span class=\"muh\">{$adminName}</span>";
+
+        if ($trip !== '') {
+            $message['USER'] .=
+                ' <span class="mut">◆'.$trip.'</span>';
+        }
+
+        $message['MAIL'] = $this->c['ADMINMAIL'];
+
+        if (!empty($this->c['ADMINKEY']) &&
+            trim($message['MSG']) === $this->c['ADMINKEY']) {
+            return 3;
+        }
+
+        return true;
+    }
+
+    return false;
+}
+
+########## 4 admin騙り検出
+
+function checkAdminFraud($name)
+{
+    $adminName = $this->c['ADMINNAME'] ?? '';
+
+    if ($adminName && strpos($name,$adminName) !== false) {
+
+        return $adminName .
+            '<span class="muh">' .
+            T('FRAUDSTER_TAG') .
+            '</span>';
+    }
+
+    return $name;
+}
+
+########### 5 固定ハンドル処理
+
+function convertHandle($name)
+{
+    $handles = $this->c['HANDLENAMES'] ?? [];
+
+    if (!$handles) {
+        return $name;
+    }
+
+    if (isset($handles[$name])) {
+
+        return $name .
+            '<span class="muh">' .
+            T('FRAUDSTER_TAG') .
+            '</span>';
+    }
+
+    $search = array_search(trim($name),$handles,true);
+
+    if ($search !== false) {
+        return "<span class=\"muh\">{$search}</span>";
+    }
+
+    return $name;
+}
+
+######### 6 表示組み立て
+
+function buildName($name,$trip,$copy)
+{
+    $adminPost = $this->c['ADMINPOST'] ?? '';
+    $adminName = $this->c['ADMINNAME'] ?? '';
+
+    # 管理パス + ◆コピー → 管理人騙り
+    if ($copy !== '' && $adminPost && crypt($name,$adminPost) === $adminPost) {
+
+        $copy = str_replace('◆','◇',$copy);
+
+        return "<span class=\"muh\">{$adminName}</span>"
+            .' <span class="mut">◇'.$copy.'</span>'
+            .T('FRAUDSTER_TAG');
+    }
+
+    if ($copy !== '') {
+
+        $copy = str_replace('◆','◇',$copy);
+
+        return $name
+            .' <span class="mut">◇'.$copy.'</span>'
+            .T('FRAUDSTER_TAG');
+    }
+
+    if ($trip !== '') {
+
+        return $name
+            .' <span class="mut">◆'.$trip.'</span>';
+    }
+
+    return $name;
+}
+
+###### 7 protectAdminName
+
+function protectAdminName($name,$trip,$copy)
+{
+    $adminName = $this->c['ADMINNAME'] ?? '';
+
+    if (!$adminName) {
+        return $name;
+    }
+
+    if (strpos($name,$adminName) !== false) {
+
+        return $adminName
+            .'<span class="muh">'
+            .T('FRAUDSTER_TAG')
+            .'</span>';
+    }
+
+    return $name;
+}
 
     /**
      * Get message from form input
@@ -1600,55 +1807,13 @@ class Bbs extends Webapp {
             $message['TITLE'] = ' ';
         }
         # User
-        if (!$message['USER']) {
-            $message['USER'] = $this->c['ANONY_NAME'];
-        }
-        else {
-            # Admin check
-            if ($this->c['ADMINPOST'] and crypt($message['USER'], $this->c['ADMINPOST']) == $this->c['ADMINPOST']) {
-                $message['USER'] = "<span class=\"muh\">{$this->c['ADMINNAME']}</span>";
-                # Enter admin mode
-                if ($this->c['ADMINKEY'] and trim($message['MSG']) == $this->c['ADMINKEY']) {
-                    return 3;
-                }
-            }
-            elseif ($this->c['ADMINPOST'] and $message['USER'] == $this->c['ADMINPOST']) {
-                $message['USER'] = $this->c['ADMINNAME'] .'<span class="muh">' . T('HACKER_TAG') . '</span>';
-            }
-            elseif (!(strpos($message['USER'], $this->c['ADMINNAME']) === FALSE)) {
-                $message['USER'] = $this->c['ADMINNAME'] . '<span class="muh">' . T('FRAUDSTER_TAG') . '</span>';
-            }
-            # Fixed handle name check
-            elseif ($this->c['HANDLENAMES'][trim($message['USER'])]) {
-                $message['USER'] .= '<span class="muh">' . T('FRAUDSTER_TAG') . '</span>';
-            }
-            # Trip function (simple deception prevention function)
-            else if (strpos($message['USER'], '#') !== FALSE) {
-                #20210702 猫・管理パスばれ防止
-                if ($this->c['ADMINPOST'] and crypt(substr($message['USER'], 0, strpos($message['USER'], '#')), $this->c['ADMINPOST']) == $this->c['ADMINPOST']) {
-                    $message['USER'] = "<span class=\"muh\"><a href=\"mailto:{$this->c['ADMINMAIL']}\">{$this->c['ADMINNAME']}</a></span>".substr($message['USER'], strpos($message['USER'], '#'));
-                }
-                #20210923 猫・固定ハンドル名 パスばれ防止
-                # 固定ハンドル名変換
-                else if (isset($this->c['HANDLENAMES'])) {
-                    $handlename = array_search(trim(substr($message['USER'], 0, strpos($message['USER'], '#'))), $this->c['HANDLENAMES']);
-                    if ($handlename !== FALSE) {
-                        $message['USER'] = "<span class=\"muh\">{$handlename}</span>".substr($message['USER'], strpos($message['USER'], '#'));
-                    }
-                }
-                $message['USER'] = substr($message['USER'], 0, strpos($message['USER'], '#')) . ' <span class="mut">◆' . substr(preg_replace("/\W/", '', crypt(substr($message['USER'], strpos($message['USER'], '#')), '00')), -7) .$this->tripuse($message['USER']). '</span>';
-            }
-            else if (strpos($message['USER'], '◆') !== FALSE) {
-                $message['USER'] .= T('FRAUDSTER_TAG');
-            }
-            # Fixed handle name conversion
-            elseif (isset($this->c['HANDLENAMES'])) {
-                $handlename = array_search(trim($message['USER']), $this->c['HANDLENAMES']);
-                if ($handlename !== FALSE) {
-                    $message['USER'] = "<span class=\"muh\">{$handlename}</span>";
-                }
-            }
-        }
+
+####################
+#Execute Post User
+####################
+$this->handleUser($message);
+####################
+
         $message['MSG'] = rtrim ($message['MSG']);
 
         # Auto-link URLs
