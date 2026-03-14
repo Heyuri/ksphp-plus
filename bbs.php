@@ -16,7 +16,7 @@ The instructions have been moved to readme.md.
 require_once("./conf.php");
 
 // Version (for copyright notice)
-$CONF['VERSION'] = '[20260310] (<span title="Heyuri Applicable Research & Development">Heyuri</span>, <span title="Hiru-ga-take">ヶ</span>, ＠Links, <span title="Giko-neko">擬古猫</span>)';
+$CONF['VERSION'] = '[20251109] (<span title="Heyuri Applicable Research & Development">Heyuri</span>, <span title="Hiru-ga-take">ヶ</span>, ＠Links, <span title="Giko-neko">擬古猫</span>)';
 
 /* Launch */
 
@@ -1588,7 +1588,11 @@ function handleUser(&$message)
 
     [$name, $trip, $copy] = $this->parseUser($user);
 
-    if ($this->checkAdmin($name, $trip, $copy, $message)) {
+    $admin = $this->checkAdmin($name, $trip, $copy, $message);
+    if ($admin === 3) {
+        return 3;
+    }
+    if ($admin === true) {
         return;
     }
 
@@ -1811,7 +1815,10 @@ function protectAdminName($name,$trip,$copy)
 ####################
 #Execute Post User
 ####################
-$this->handleUser($message);
+$result = $this->handleUser($message);
+if ($result === 3) {
+	return 3;
+}
 ####################
 
         $message['MSG'] = rtrim ($message['MSG']);
