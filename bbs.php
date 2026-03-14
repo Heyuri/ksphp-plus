@@ -1,5 +1,5 @@
 <?php
-if (strpos(phpversion(), '8') !== 0) {
+if (version_compare(PHP_VERSION, '8.0.0', '<')) {
     echo 'Error: PHP version is '.phpversion().'. This script is compatible with PHP 8.0 and above.';
     exit();
 }
@@ -1629,7 +1629,11 @@ function handleUser(&$message)
 
     [$name, $trip, $copy] = $this->parseUser($user);
 
-    if ($this->checkAdmin($name, $trip, $copy, $message)) {
+    $admin = $this->checkAdmin($name, $trip, $copy, $message);
+    if ($admin === 3) {
+        return 3;
+    }
+    if ($admin === true) {
         return;
     }
 
@@ -1852,7 +1856,10 @@ function protectAdminName($name,$trip,$copy)
 ####################
 #Execute Post User
 ####################
-$this->handleUser($message);
+$result = $this->handleUser($message);
+if ($result === 3) {
+	return 3;
+}
 ####################
 
         $message['MSG'] = rtrim ($message['MSG']);

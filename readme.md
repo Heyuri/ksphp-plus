@@ -191,6 +191,9 @@ m=u     Execute UNDO
 * Added complete internationalization for Japanese, English being now optional
 * Renamed software back to KuzuhaScriptPHP+ from KuzuhaScriptPHP+EN
 
+### 2026/03/10
+* Administrator keys can now be combined with a tripcode, implemented by gikonekos(擬古猫)
+
 ## ToDo:
 * View posts by thread
 * Improve speed of unread on tree view
