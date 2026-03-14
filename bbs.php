@@ -1,5 +1,5 @@
 <?php
-if (strpos(phpversion(), '8') !== 0) {
+if (version_compare(PHP_VERSION, '8.0.0', '<')) {
     echo 'Error: PHP version is '.phpversion().'. This script is compatible with PHP 8.0 and above.';
     exit();
 }
