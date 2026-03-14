@@ -196,6 +196,41 @@ function script_run() {
 }
 
 /**
+ * Detects if any honeypot fields are filled (for spam prevention)
+ * @param array $fields Optional array of field values (defaults to $_POST)
+ * @return bool True if any honeypot field is filled, false otherwise
+ */
+function detectHoneyPot($fields = null) {
+    // If no fields are provided, use $_POST by default
+    if ($fields === null) {
+        $fields = $_POST;
+    }
+
+    // List of honeypot field names to check
+    $honeypots = [
+        'e-mail',
+        'username',
+        'subject',
+        'comment',
+        'firstname',
+        'lastname',
+        'city',
+        'state',
+        'zipcode'
+    ];
+    
+    // Check if any of the honeypot fields are filled
+    foreach ($honeypots as $name) {
+        if (!empty($fields[$name])) {
+            return true;
+        }
+    }
+
+    // No honeypot fields are filled
+    return false;
+}
+
+/**
  * Base web application class - Webapp
  *
  * Super class for each mode. Describes the processing common to each module.
@@ -1476,6 +1511,12 @@ class Bbs extends Webapp {
         if (Func::hostname_match($this->c['HOSTNAME_POSTDENIED'], $this->c['HOSTAGENT_BANNED'])) {
             $this->prterror(T('POSTING_SUSPENDED'));
         }
+        
+        /* Catch spambots */
+        if(detectHoneyPot()) {
+            $this->prterror(T('SPAM_KUN'));
+        }
+
         if ($this->c['BBSMODE_ADMINONLY'] == 1 or ($this->c['BBSMODE_ADMINONLY'] == 2 and !$this->f['f'])) {
             if (crypt($this->f['u'], $this->c['ADMINPOST']) != $this->c['ADMINPOST']) {
                 $this->prterror(T('ADMIN_ONLY_POSTING'));
