@@ -100,7 +100,6 @@ class Bbsadmin extends Webapp {
             $this->prtadminmenu();
         }
 
-
         if (!defined('BBS_ACTIVATED') and $this->c['GZIPU']) {
             ob_end_flush();
         }
