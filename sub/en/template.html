@@ -1,3 +1,13 @@
+<!-- Reusable navigation links -->
+<patTemplate:tmpl name="navlinks">
+<header>
+<span class="pagetitle"><a href="{CGIURL}" style="text-decoration: none;">{BBSTITLE}</a></span>
+<span class="link_upper">
+<a href="{INFOPAGE}" title="Go to PR office">PR&nbsp;office</a> <a href="mailto:{ADMINMAIL}" title="Email the administrator">Contact</a> <a href="{DEFURL}&amp;m=g" target="_blank" title="Browse and search through old posts.">Message&nbsp;logs</a> <a href="{CGIURL}?{QUERY}&amp;m=tree" title="Display threads as branches">Tree&nbsp;view</a> |
+<a href="{CGIURL}?m=login" title="Admin/Mod login">Manage</a> | &nbsp;<a href="#bottom" title="Bottom">▼</a>
+</span>
+</header>
+</patTemplate:tmpl>
 <!--KuzuhaScriptPHP HTML template main-->
 <!-- HTML header -->
 <patTemplate:tmpl name="header">
@@ -27,6 +37,43 @@
     <style>
     html { scroll-behavior: smooth; }
     body { max-height: 100%; -webkit-text-size-adjust: 100%; background: #{C_BACKGROUND}; color: #{C_TEXT};font-family: "BIZ UDゴシック", "Noto Sans Mono CJK JP", "Noto Sans Mono", "IPAゴシック", "HGゴシックM", "ＭＳ ゴシック", "MS Gothic", monospace; font-size: 14px; }
+    
+    .postlists {
+        max-width: 100%;
+        margin: 0 auto;
+        border-spacing: 1px;
+    }
+
+    .postlists th {
+        background-color: #007f7f;
+        color: #ffffff;
+    }
+
+    .postlists th a {
+        color: #ffffff;
+    }
+
+    .postlists tbody tr:nth-child(odd) {
+        background-color: #003434;
+    }
+
+    .postlists tbody tr:nth-child(even) {
+        background-color: #004848;
+    }
+
+    .postlists th,
+    .postlists td {
+        padding: 0.125em;
+    }
+
+    .managepostsCommentWrapper { 
+        word-break: break-word;
+        white-space: normal;
+    }
+
+    .centerItem {
+        text-align: center;
+    }
     /* Links */
     a:link { color: #{C_A_COLOR}; transition:0.2s; }
     a:visited { color: #{C_A_VISITED}; }
@@ -166,9 +213,10 @@
 <!-- Upper area of the main bulletin board (section above the post loop) -->
 <patTemplate:tmpl name="main_upper">
 <header>
-<span class="pagetitle"><a href="{CGIURL}" style="text-decoration: none;">{BBSTITLE}</a></span>　
+<span class="pagetitle"><a href="{CGIURL}" style="text-decoration: none;">{BBSTITLE}</a></span>
 <span class="link_upper">
-<a href="{INFOPAGE}" title="Go to PR office">PR&nbsp;office</a> <a href="mailto:{ADMINMAIL}" title="Email the administrator">Contact</a> <a href="{DEFURL}&amp;m=g" target="_blank" title="Browse and search through old posts.">Message&nbsp;logs</a> <a href="{CGIURL}?{QUERY}&amp;m=tree" title="Display threads as branches">Tree&nbsp;view</a> |&nbsp;<a href="#bottom" title="Bottom">▼</a>
+<a href="{INFOPAGE}" title="Go to PR office">PR&nbsp;office</a> <a href="mailto:{ADMINMAIL}" title="Email the administrator">Contact</a> <a href="{DEFURL}&amp;m=g" target="_blank" title="Browse and search through old posts.">Message&nbsp;logs</a> <a href="{CGIURL}?{QUERY}&amp;m=tree" title="Display threads as branches">Tree&nbsp;view</a> |
+<a href="{CGIURL}?m=login" title="Admin/Mod login">Manage</a> | &nbsp;<a href="#bottom" title="Bottom">▼</a>
 </span>
 </header>
 <patTemplate:link src="form" />

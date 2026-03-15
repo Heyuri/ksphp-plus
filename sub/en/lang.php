@@ -16,6 +16,7 @@ $MSG = array(
     /* Posting / validation */
     'POSTING_SUSPENDED'       => 'The posting function of this bulletin board is currently suspended.',
     'ADMIN_ONLY_POSTING'      => 'Only administrators are allowed to post to the bulletin board.',
+    'ADMIN_POST_DISABLED'     => 'Admin access via post form is disabled. Please use the Manage link.',
     'BAD_REFERER'             => 'Posts cannot be made from any URLs besides',
     'POST_TOO_WIDE'           => 'There are too many characters in the post contents.',
     'POST_TOO_MANY_LINES'     => 'There are too many line breaks in the post contents.',

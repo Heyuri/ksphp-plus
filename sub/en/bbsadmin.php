@@ -46,25 +46,25 @@ class Bbsadmin extends Webapp {
      * Main process
      */
     function main() {
+        // Only allow access if session is admin
+        if (!isModerator()) {
+            header('Location: ' . $this->c['CGIURL'] . '?m=login');
+            exit();
+        }
 
         if (!defined('BBS_ACTIVATED')) {
-
             # Start measuring execution time
             $this->setstarttime();
-
             # Form acquisition preprocessing
             $this->procForm();
-
             # Reflect user settings
             $this->refcustom();
             $this->setusersession();
-
             # gzip compressed transfer
             if ($this->c['GZIPU']) {
                 ob_start("ob_gzhandler");
             }
         }
-
         # Log file viewer
         if (@$this->f['ad'] == 'l') {
             $this->prtlogview(TRUE);
@@ -77,6 +77,9 @@ class Bbsadmin extends Webapp {
         else if (@$this->f['ad'] == 'x') {
             if (isset($this->f['x'])) {
                 $this->killmessage($this->f['x']);
+                // Redirect to the message deletion list to prevent resubmission
+                header('Location: ' . $this->c['CGIURL'] . '?m=ad&ad=k');
+                exit();
             }
             $this->prtkilllist();
         }
@@ -96,7 +99,6 @@ class Bbsadmin extends Webapp {
         else {
             $this->prtadminmenu();
         }
-
 
         if (!defined('BBS_ACTIVATED') and $this->c['GZIPU']) {
             ob_end_flush();

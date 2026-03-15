@@ -1,36 +1,32 @@
 <!-- KuzuhaScriptPHP HTML template for admin mode -->
 <!-- Admin menu page -->
 <patTemplate:tmpl name="adminmenu">
-<header><span class="pagetitle"><a href="{CGIURL}" style="text-decoration: none;">{BBSTITLE}</a></span></header>
+<patTemplate:link src="navlinks" />
 <h1>Administration menu</h1>
 <p>
 	<strong>WARNING:</strong>ACCESS BY UNAUTHORIZED PERSONNEL IS STRICTLY PROHIBITED. PERPETRATORS WILL BE TRACKED, LOCATED, AND DETAINED.
 </p>
-<form method="post" action="{CGIURL}">
+<form method="GET" action="{CGIURL}">
 	<input type="hidden" name="m" value="ad" />
 	<input type="hidden" name="ad" value="k" />
-	<input type="hidden" name="u" value="{U}" />
 	<input type="hidden" name="v" value="{V}" />
 	<input type="submit" value="Delete messages" class="btn" />
 </form>
-<form method="post" action="{CGIURL}">
+<form method="GET" action="{CGIURL}">
 	<input type="hidden" name="m" value="ad" />
 	<input type="hidden" name="ad" value="l" />
-	<input type="hidden" name="u" value="{U}" />
 	<input type="hidden" name="v" value="{V}" />
 	<input type="submit" value="View log file" class="btn" />
 </form>
-<form method="post" action="{CGIURL}">
+<form method="GET" action="{CGIURL}">
 	<input type="hidden" name="m" value="ad" />
 	<input type="hidden" name="ad" value="p" />
-	<input type="hidden" name="u" value="{U}" />
 	<input type="hidden" name="v" value="{V}" />
 	<input type="submit" value="Regenerate encrypted password" class="btn" />
 </form>
-<form method="post" action="{CGIURL}">
+<form method="GET" action="{CGIURL}">
 	<input type="hidden" name="m" value="ad" />
 	<input type="hidden" name="ad" value="phpinfo" />
-	<input type="hidden" name="u" value="{U}" />
 	<input type="hidden" name="v" value="{V}" />
 	<input type="submit" value="Server PHP configuration information" class="btn" />
 </form>
@@ -42,11 +38,10 @@
 
 <!-- Message deletion mode main page -->
 <patTemplate:tmpl name="killlist">
-<header><span class="pagetitle"><a href="{CGIURL}" style="text-decoration: none;">{BBSTITLE}</a></span></header>
+<patTemplate:link src="navlinks" />
 <h1>Message deletion mode</h1>
 <form method="post" action="{CGIURL}">
 	<input type="hidden" name="m" value="ad" />
-	<input type="hidden" name="u" value="{U}" />
 	<input type="hidden" name="v" value="{V}" />
 	<a href="{DEFURL}">Return</a>
 	<input type="button" onclick="location.href='#bottom'" accesskey="B" value="▼" class="btn" title="Alt(+Shift)+B">
@@ -55,34 +50,53 @@
 	<input type="submit" value="　[!] Perform deletion　" class="btn" />
 	<input type="hidden" name="m" value="ad" />
 	<input type="hidden" name="ad" value="x" />
-	<input type="hidden" name="u" value="{U}" />
 	<input type="hidden" name="v" value="{V}" />
 	<p>Please check the checkboxes of the posts you wish to delete, then click the [Perform deletion] button at the bottom.</p>
 	<hr>
-	<span class="medium">Delete - View - Date posted - Subject - Username - Contents (truncated)</span>
-	<pre>
+	<table class="postlists">
+		<thead class="deletionTableHead">
+			<tr class="deletionTableRow">
+				<th class="deletionTableHeader">Delete</th>
+				<th class="deletionTableHeader">View</th>
+				<th class="deletionTableHeader">Date Posted</th>
+				<th class="deletionTableHeader">Subject</th>
+				<th class="deletionTableHeader">Username</th>
+				<th class="deletionTableHeader">Host</th>
+				<th class="deletionTableHeader">Comment</th>
+			</tr>
+		</thead>
+		<tbody class="deletionTableBody">
 <patTemplate:tmpl name="killmessage">
-<input type="checkbox" name="x[]" value="{POSTID}" /> - <a href="{CGIURL}?m=f&amp;s={POSTID}" target="link">{POSTID}</a> - [{WDATE}] - {TITLE} - {USER_NOTAG} - {MSGDIGEST}
+			<tr class="deletionTableRow">
+				<td class="deletionTableCell centerItem"><input type="checkbox" name="x[]" value="{POSTID}" /></td>
+				<td class="deletionTableCell centerItem"><a href="{CGIURL}?m=f&amp;s={POSTID}" target="link">{POSTID}</a></td>
+				<td class="deletionTableCell centerItem">{WDATE}</td>
+				<td class="deletionTableCell">{TITLE}</td>
+				<td class="deletionTableCell">{USER_NOTAG}</td>
+				<td class="deletionTableCell">{PHOST}</td>
+				<td class="deletionTableCell commentCell"><div class="managepostsCommentWrapper">{MSG}</div></td>
+			</tr>
 </patTemplate:tmpl>
-</pre>
-<hr>
-<input type="submit" value="　[!] Perform deletion　" class="btn" />
+		</tbody>
+	</table>
+	<hr>
+	<input type="submit" value="　[!] Perform deletion　" class="btn" />
 </form>
 <form method="post" action="{CGIURL}">
 	<input type="hidden" name="m" value="ad" />
-	<input type="hidden" name="u" value="{U}" />
 	<input type="hidden" name="v" value="{V}" />
 	<a href="{DEFURL}">Return</a>
-	<input type="button" onclick="location.href='#TOP'" accesskey="T" value="▲" class="btn" title="Alt(+Shift)+T"></form>
+	<input type="button" onclick="location.href='#TOP'" accesskey="T" value="▲" class="btn" title="Alt(+Shift)+T">
+</form>
 </patTemplate:tmpl>
 
 <!-- Encrypted password generation page -->
 <patTemplate:tmpl name="setpass">
-<header><span class="pagetitle">{BBSTITLE}</span> - Password settings page</header><br>
+<patTemplate:link src="navlinks" />
+<h1>Password settings page</h1>
 <form method="post" action="{CGIURL}">
 	<input type="hidden" name="m" value="ad" />
 	<input type="hidden" name="ad" value="ps" />
-	<input type="hidden" name="u" value="{U}" />
 	<input type="hidden" name="v" value="{V}" />
 	<div class="bbsmsg">Set your password.<br>
 		Please enter the administrator password that you will use to administer the bulletin board from now on.<br>
@@ -101,7 +115,8 @@
 
 <!-- Encrypted password display page -->
 <patTemplate:tmpl name="pass">
-<header><span class="pagetitle">{BBSTITLE}</span> - Password settings page</header>
+<patTemplate:link src="navlinks" />
+<h1>Password settings page</h1>
 <form method="post" action="{CGIURL}">
 	<div class="bbsmsg">Encrypted password generated!<br>
 	Paste the following encrypted password string into the designated section of the main bulletin board script.</div>

@@ -1,4 +1,8 @@
 <?php
+
+// Start session for admin/mod login
+session_start();
+
 if (version_compare(PHP_VERSION, '8.0.0', '<')) {
     echo 'Error: PHP version is '.phpversion().'. This script is compatible with PHP 8.0 and above.';
     exit();
@@ -66,6 +70,7 @@ $CONF['TEMPLATE']          = $SUBDIR . 'template.html';
 $CONF['TEMPLATE_ADMIN']    = $SUBDIR . 'tmpladmin.html';
 $CONF['TEMPLATE_LOG']      = $SUBDIR . 'tmpllog.html';
 $CONF['TEMPLATE_TREEVIEW'] = $SUBDIR . 'tmpltree.html';
+$CONF['TEMPLATE_LOGIN']    = $SUBDIR . 'login.html';
 
 // ----------------------------------------------------------------------
 // Include file paths
@@ -132,6 +137,7 @@ define('CURRENT_TIME', time() - $CONF['DIFFTIME'] * 60 * 60 + $CONF['DIFFSEC']);
  *
  * Basically, this is where the module branches are described
  */
+
 function script_run() {
 
     $CONF = &$GLOBALS['CONF'];
@@ -150,29 +156,67 @@ function script_run() {
         }
     }
 
+    # Admin/mod login page (GET: ?m=login)
+    elseif ($_GET['m'] == 'login') {
+        if (isModerator()) {
+            header('Location: ' . $CONF['CGIURL'] . '?m=ad');
+            exit();
+        }
+        require_once(LIB_TEMPLATE);
+        $t = new patTemplate();
+        // Load both main template and login template for subtemplate support
+        $t->readTemplatesFromFile($CONF['TEMPLATE']);
+        $t->readTemplatesFromFile($CONF['TEMPLATE_LOGIN']);
+
+        $templateValues = removeArrayValues($CONF);
+
+        $t->addGlobalVars($templateValues);
+        $t->displayParsedTemplate('login');
+        exit();
+    }
+    # Admin/mod login POST
+    elseif ($_POST['m'] == 'login') {
+        $pass = trim($_POST['adminpass'] ?? '');
+        $is_mod = false;
+        if (crypt($pass, $CONF['ADMINPOST']) === $CONF['ADMINPOST']) {
+            $is_mod = true;
+        }
+        if ($is_mod) {
+            $_SESSION['is_mod'] = true;
+            header('Location: ' . $CONF['CGIURL'] . '?m=ad');
+            exit();
+        } else {
+            require_once(LIB_TEMPLATE);
+            $t = new patTemplate();
+            $t->readTemplatesFromFile($CONF['TEMPLATE']);
+            $t->readTemplatesFromFile($CONF['TEMPLATE_LOGIN']);
+
+            // environment vars for template
+            $templateValues = removeArrayValues($CONF);
+
+            $t->addGlobalVars($templateValues);
+            $t->addVar('login', 'LOGIN_ERROR', 'Invalid username or password.');
+            $t->setAttribute('login_error', 'visibility', 'visible');
+            $t->displayParsedTemplate('login');
+            exit();
+        }
+    }
+    # Admin mode (GET: ?m=ad) - session required
+    elseif ($_REQUEST['m'] == 'ad' && isModerator()) {
+        require_once(PHP_BBSADMIN);
+        $bbsadmin = new Bbsadmin();
+        $bbsadmin->main();
+    }
     # Message log search mode (sub/bbslog.php)
     elseif ($_GET['m'] == 'g' or $_POST['m'] == 'g') {
         require_once(PHP_GETLOG);
         $getlog = new Getlog();
         $getlog->main();
     }
-    # Admin mode (sub/bbsadmin.php)
+    # Legacy admin POST (disable: always redirect to login)
     elseif ($_POST['m'] == 'ad') {
-        if ($CONF['ADMINPOST'] and $CONF['ADMINKEY'] and $_POST['v'] == $CONF['ADMINKEY']
-            and crypt($_POST['u'], $CONF['ADMINPOST']) == $CONF['ADMINPOST']) {
-            require_once(PHP_BBSADMIN);
-            $bbsadmin = new Bbsadmin();
-            $bbsadmin->main();
-        }
-        elseif ($CONF['BBSMODE_IMAGE'] == 1) {
-            require_once(PHP_IMAGEBBS);
-            $imagebbs = new Imagebbs();
-            $imagebbs->main();
-        }
-        else {
-            $bbs = new Bbs();
-            $bbs->main();
-        }
+        header('Location: ' . $CONF['CGIURL'] . '?m=login');
+        exit();
     }
     # Tree view (sub/bbstree.php)
     elseif ($_GET['m'] == 'tree' or $_POST['m'] == 'tree') {
@@ -200,7 +244,7 @@ function script_run() {
  * @param array $fields Optional array of field values (defaults to $_POST)
  * @return bool True if any honeypot field is filled, false otherwise
  */
-function detectHoneyPot($fields = null) {
+function detectHoneyPot(?array $fields = null): bool {
     // If no fields are provided, use $_POST by default
     if ($fields === null) {
         $fields = $_POST;
@@ -228,6 +272,31 @@ function detectHoneyPot($fields = null) {
 
     // No honeypot fields are filled
     return false;
+}
+
+/**
+ * Removes array values from an array, leaving only scalar values.
+ *
+ * @param array $array The input array
+ * @return array The array with only scalar values
+ */
+function removeArrayValues(array $array): array {
+    foreach ($array as $key => $value) {
+        if (is_array($value)) {
+            unset($array[$key]);
+        }
+    }
+    return $array;
+}
+
+/**
+ * Validates if the given string is a valid email address.
+ *
+ * @param string $email The email address to validate
+ * @return bool True if the email is valid, false otherwise
+ */
+function isModerator(): bool {
+    return isset($_SESSION['is_mod']) && $_SESSION['is_mod'];
 }
 
 /**
@@ -376,9 +445,9 @@ function tripuse($key) {
         $this->s['DEFURL'] = $this->c['CGIURL'] . '?' . $this->s['QUERY'];
         # Initialize template variables
         $tmp = array_merge($this->c, $this->s);
-        foreach ($tmp as $key => $val) {
-            if (is_array($val)) unset($tmp[$key]);
-        }
+
+        $tmp = removeArrayValues($tmp);
+
         $this->t->addGlobalVars($tmp);
     }
 
@@ -866,12 +935,9 @@ class Bbs extends Webapp {
                     $this->prtmain(TRUE);
                 }
             }
-            # Entering admin mode
+            # Admin mode via post is disabled
             elseif ($posterr == 3) {
-                define('BBS_ACTIVATED', TRUE);
-                require_once(PHP_BBSADMIN);
-                $bbsadmin = new Bbsadmin($this);
-                $bbsadmin->main();
+                $this->prterror(T('ADMIN_POST_DISABLED'));
             }
             # Post completion page
             elseif ($this->f['f']) {
@@ -1630,13 +1696,12 @@ function handleUser(&$message)
     [$name, $trip, $copy] = $this->parseUser($user);
 
     $admin = $this->checkAdmin($name, $trip, $copy, $message);
-    if ($admin === 3) {
-        return 3;
-    }
+
     if ($admin === true) {
         return;
     }
 
+    // Admin access via post form is disabled
     $name = $this->checkAdminFraud($name);
     $name = $this->protectAdminName($name,$trip,$copy);
     $name = $this->convertHandle($name);
@@ -1691,6 +1756,13 @@ function checkAdmin($name,$trip,$copy,&$message)
         return false;
     }
 
+    // Warn only if admin password is posted in BOTH the name and comment fields
+    if ($adminPost && crypt($name, $adminPost) === $adminPost 
+        && crypt(($message['MSG'] ?? ''), $adminPost) === $adminPost
+    ) {    
+        $this->prterror(T('ADMIN_POST_DISABLED'));
+    }
+    
     # ◆コピーがある場合は管理不可
     if ($copy !== '') {
         return false;
