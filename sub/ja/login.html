@@ -1,0 +1,17 @@
+<patTemplate:tmpl name="login">
+<patTemplate:link src="header" />
+<patTemplate:link src="navlinks" />
+<main>
+<h1>管理者ログイン</h1>
+<form method="post" action="{CGIURL}">
+    <input type="hidden" name="m" value="login" />
+    <label for="adminpass">パスワード：</label>
+    <input type="password" id="adminpass" name="adminpass" maxlength="64" required><br><br>
+    <input type="submit" value="入室" class="btn" />
+</form>
+<patTemplate:tmpl name="login_error" visibility="hidden">
+<p class="error">{LOGIN_ERROR}</p>
+</patTemplate:tmpl>
+</main>
+<patTemplate:link src="copyright" />
+</patTemplate:tmpl>
