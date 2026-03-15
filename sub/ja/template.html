@@ -1,3 +1,13 @@
+<!--再利用可能なナビゲーションリンク-->
+<patTemplate:tmpl name="navlinks">
+<header>
+<span class="pagetitle"><a href="{CGIURL}" style="text-decoration: none;">{BBSTITLE}</a></span>
+<span class="link_upper">
+<a href="{INFOPAGE}" title="広報室へ">広報室</a> <a href="mailto:{ADMINMAIL}" title="管理人へメール">連絡先</a> <a href="{DEFURL}&amp;m=g" target="_blank" title="過去の投稿を閲覧、検索します。">過去ログ</a> <a href="{CGIURL}?{QUERY}&amp;m=tree" title="スレッドを枝状に表示します">ツリー表示</a> |
+<a href="{CGIURL}?m=login" title="管理画面へ">管理画面</a> | &nbsp;<a href="#bottom" title="下">▼</a>
+</span>
+</header>
+</patTemplate:tmpl>
 <!--くずはすくりぷとPHP  HTMLテンプレート メイン-->
 <!-- HTMLヘッダー -->
 <patTemplate:tmpl name="header">
@@ -27,6 +37,43 @@
     <style>
         html { scroll-behavior: smooth; }
         body { max-height: 100%; -webkit-text-size-adjust: 100%; background: #{C_BACKGROUND}; color: #{C_TEXT}; font-family: "BIZ UDゴシック", "Noto Sans Mono CJK JP", "Noto Sans Mono", "IPAゴシック", "HGゴシックM", "ＭＳ ゴシック", "MS Gothic", monospace; font-size: 14px; }
+    
+        .postlists {
+            max-width: 100%;
+            margin: 0 auto;
+            border-spacing: 1px;
+        }
+
+        .postlists th {
+            background-color: #007f7f;
+            color: #ffffff;
+        }
+
+        .postlists th a {
+            color: #ffffff;
+        }
+
+        .postlists tbody tr:nth-child(odd) {
+            background-color: #003434;
+        }
+
+        .postlists tbody tr:nth-child(even) {
+            background-color: #004848;
+        }
+
+        .postlists th,
+        .postlists td {
+            padding: 0.125em;
+        }
+
+        .deletionTableCellWrapper {
+            white-space: normal;
+            word-break: break-word;
+        }
+
+        .centerItem {
+            text-align: center;
+        }
         /* リンク */
         a:link { color: #{C_A_COLOR}; transition:0.2s; }
         a:visited { color: #{C_A_VISITED}; }
@@ -166,9 +213,11 @@
 <!-- 掲示板メイン上部（記事のループよりも上の部分） -->
 <patTemplate:tmpl name="main_upper">
 <header>
-<span class="pagetitle"><a href="{CGIURL}" style="text-decoration: none;">{BBSTITLE}</a></span>　
+<span class="pagetitle"><a href="{CGIURL}" style="text-decoration: none;">{BBSTITLE}</a></span>
 <span class="link_upper">
-<a href="{INFOPAGE}" title="広報室へ">広報室</a>&nbsp;<a href="mailto:{ADMINMAIL}" title="管理人へメール">連絡先</a>&nbsp;<a href="{DEFURL}&amp;m=g" target="_blank" title="過去の投稿を閲覧、検索します。">過去ログ</a>&nbsp;<a href="{CGIURL}?{QUERY}&amp;m=tree" title="スレッドを枝状に表示します">ツリー表示</a>&nbsp;|&nbsp;<a href="#bottom" title="下">▼</a>
+<a href="{INFOPAGE}" title="広報室へ">広報室</a>&nbsp;<a href="mailto:{ADMINMAIL}" title="管理人へメール">連絡先</a>&nbsp;<a href="{DEFURL}&amp;m=g" target="_blank" title="過去の投稿を閲覧、検索します。">過去ログ</a>&nbsp;<a href="{CGIURL}?{QUERY}&amp;m=tree" title="スレッドを枝状に表示します">ツリー表示</a>&nbsp;|&nbsp;
+
+<a href="{CGIURL}?m=login" title="管理画面へ">管理画面</a> | &nbsp;<a href="#bottom" title="下">▼</a>
 </span>
 </header>
 <patTemplate:link src="form" />
@@ -228,6 +277,19 @@
     <input type="hidden" name="c" value="{C}" />
     <input type="hidden" name="p" value="{TOPPOSTID}" />
     <input type="hidden" name="g" value="{GZIPU}" />
+
+    <input type="hidden" name="e-mail" value="">
+    <input type="hidden" name="username" value="">
+    <input type="hidden" name="subject" value="">
+    <input type="hidden" name="comment" value="">
+    <input type="hidden" name="firstname" value="">
+    <input type="hidden" name="lastname" value="">
+    <input type="hidden" name="city" value="">
+    <input type="hidden" name="state" value="">
+    <input type="hidden" name="zipcode" value="">
+    <input type="hidden" name="country" value="">
+    <input type="hidden" name="url" value="">
+
     <input type="hidden" name="hide" value="{HIDEFORM}" />
     <input type="hidden" name="loff" value="{LINKOFF}" />
     <input type="hidden" name="sim" value="{SHOWIMG}" />
