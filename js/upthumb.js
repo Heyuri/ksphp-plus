@@ -1,144 +1,255 @@
 (function() {
-    'use strict';
+	'use strict';
 
-    // Function to add the new checkbox
-    function addCheckbox() {
-        const smallDiv = document.querySelector('.small');
-        if (smallDiv) {
-            const label = document.createElement('label');
-            label.setAttribute('for', 'enableThumbnails');
-            label.textContent = 'Uploader thumbnails';
-            const checkbox = document.createElement('input');
-            checkbox.type = 'checkbox';
-            checkbox.name = 'enableThumbnails';
-            checkbox.accessKey = 'T';
-            checkbox.value = 'checked';
-            checkbox.title = 'Alt(+Shift)+T';
-            checkbox.id = 'enableThumbnails';
-            checkbox.checked = localStorage.getItem('enableThumbnails') !== 'false';
+	const thumbnailingAllowed = false;
 
-            smallDiv.insertBefore(label, smallDiv.querySelector('input[type="submit"]'));
-            smallDiv.insertBefore(checkbox, smallDiv.querySelector('input[type="submit"]'));
-        }
-    }
+	const instances = [
+		{
+			uploadDir: 'https://up.heyuri.net/src/',
+			thumbDir: 'https://up.heyuri.net/thumb/',
+			thumb_suffix: 's',
+			thumbnailExtension: 'jpg'
+		},
+		{
+			uploadDir: 'https://up.heyuri.net/user/boards/*/src/',
+			thumbDir: 'https://up.heyuri.net/user/boards/*/thmb/',
+			thumb_suffix: '_thumb',
+			thumbnailExtension: 'jpg'
+		},
+		{
+			uploadDir: 'https://example.com/uploads/',
+			thumbDir: 'https://example.com/thumbs/',
+			thumb_suffix: '_thumb',
+			thumbnailExtension: 'jpg'
+		}
+	];
 
-    // Function to create the thumbnails
-    function createThumbnail(url, originalUrl) {
-        const anchor = document.createElement('a');
-        anchor.href = originalUrl;
-        anchor.target = '_blank';
-        const img = document.createElement('img');
-        img.src = url;
-        img.setAttribute('loading', 'lazy'); // Add lazy loading
-        img.style.maxHeight = '95px';
-        img.style.maxWidth = '200px';
-        img.style.margin = '5px';
-        anchor.appendChild(img);
-        return anchor;
-    }
+	if (!thumbnailingAllowed) {
+		return;
+	}
 
-    // Function to check if the thumbnail exists
-    function thumbnailExists(url) {
-        return new Promise((resolve, reject) => {
-            const xhr = new XMLHttpRequest();
-            xhr.open('HEAD', url, true);
-            xhr.onload = () => {
-                if (xhr.status === 200) {
-                    resolve(true);
-                } else {
-                    resolve(false);
-                }
-            };
-            xhr.onerror = () => resolve(false);
-            xhr.send();
-        });
-    }
+	function normalizeBase(url) {
+		return url.replace(/^[a-z]+:\/\//i, '');
+	}
 
-    // Function to get the thumbnail URL based on the original URL
-    function getThumbnailUrl(url) {
-        if (url.includes('/src/')) {
-            return url.replace('/src/', '/thmb/').replace(/\.\w+$/, '_thumb.jpg');
-        } else if (url.includes('/gsrc/')) {
-            return url.replace('/gsrc/', '/gthmb/').replace(/\.\w+$/, '_thumb.jpg');
-        } else {
-            return null;
-        }
-    }
+	function escapeRegex(text) {
+		return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+	}
 
-    // List of allowed file extensions
-    const allowedExtensions = ['jpg', 'jpeg', 'bmp', 'webp', 'png', 'gif', 'mp4', 'webm'];
+	function buildUploadRegex(uploadDir) {
+		const normalized = normalizeBase(uploadDir);
+		const parts = normalized.split('*').map(escapeRegex);
+		return new RegExp('^(?:[a-z]+:\\/\\/)?' + parts.join('([^/]+)'));
+	}
 
-    // Function to handle the script functionality
-    function runScript() {
-        // Select all the post contents
-        const postContents = document.querySelectorAll('.contents pre.msgnormal, .msgtree .ngline');
+	function findInstanceMatch(url) {
+		for (const instance of instances) {
+			const regex = buildUploadRegex(instance.uploadDir);
+			const match = url.match(regex);
+			if (match) {
+				return {
+					instance: instance,
+					match: match
+				};
+			}
+		}
 
-        // Process each post content
-        postContents.forEach(postContent => {
-            // Array to hold the heyuri links
-            const heyuriLinks = [];
+		return null;
+	}
 
-            // Get all the links in the post content
-            const links = postContent.querySelectorAll('a');
+	function addCheckbox() {
+		const smallDiv = document.querySelector('.small');
+		if (!smallDiv) {
+			return;
+		}
 
-            // Loop through all the links and find the ones pointing to up.heyuri.net with /src/ and not starting with >
-            links.forEach(link => {
-                const parentLine = link.closest('span.q') || link.parentElement;
-                const lineContent = parentLine.textContent.trim();
-                const previousSiblingText = link.previousSibling ? link.previousSibling.textContent.trim() : '';
+		if (document.getElementById('enableThumbnails')) {
+			return;
+		}
 
-                if ((!lineContent.startsWith('>') || !previousSiblingText.startsWith('>')) && 
-                    link.href.includes('up.heyuri.net') && 
-                    (link.href.includes('/src/') || link.href.includes('/msrc/') || link.href.includes('/gsrc/') || link.href.includes('/gemusrc/') || link.href.includes('/user/boards/'))) {
-                    heyuriLinks.push(link.href);
-                }
-            });
+		const submitButton = smallDiv.querySelector('input[type="submit"]');
+		if (!submitButton) {
+			return;
+		}
 
-            // Append the thumbnails at the end of the post
-            if (heyuriLinks.length > 0) {
-                const thumbContainer = document.createElement('div');
-                thumbContainer.style.marginTop = '10px';
+		const label = document.createElement('label');
+		label.setAttribute('for', 'enableThumbnails');
+		label.textContent = 'Uploader thumbnails';
 
-                heyuriLinks.forEach(async url => {
-                    const extension = url.split('.').pop().toLowerCase();
-                    if (allowedExtensions.includes(extension)) {
-                        const thumbnailUrl = getThumbnailUrl(url);
-                        if (thumbnailUrl) {
-                            const isThumbnailAvailable = await thumbnailExists(thumbnailUrl);
-                            if (isThumbnailAvailable) {
-                                const thumb = createThumbnail(thumbnailUrl, url);
-                                thumbContainer.appendChild(thumb);
-                            } else if (![ '.webm', '.mp4' ].some(ext => url.endsWith(ext))) {
-                                const thumb = createThumbnail(url, url);
-                                thumbContainer.appendChild(thumb);
-                            }
-                        }
-                    }
-                });
+		const checkbox = document.createElement('input');
+		checkbox.type = 'checkbox';
+		checkbox.name = 'enableThumbnails';
+		checkbox.accessKey = 'T';
+		checkbox.value = 'checked';
+		checkbox.title = 'Alt(+Shift)+T';
+		checkbox.id = 'enableThumbnails';
+		checkbox.checked = localStorage.getItem('enableThumbnails') !== 'false';
 
-                postContent.appendChild(thumbContainer);
-            }
-        });
-    }
+		smallDiv.insertBefore(label, submitButton);
+		smallDiv.insertBefore(checkbox, submitButton);
+	}
 
-    // Initialize script
-    function init() {
-        addCheckbox();
-        const checkbox = document.getElementById('enableThumbnails');
-        if (checkbox) {
-            checkbox.addEventListener('change', () => {
-                const isChecked = checkbox.checked;
-                localStorage.setItem('enableThumbnails', isChecked); // Save state
-                if (isChecked) {
-                    runScript();
-                }
-            });
+	function createThumbnail(thumbnailUrl, originalUrl) {
+		const anchor = document.createElement('a');
+		anchor.href = originalUrl;
+		anchor.target = '_blank';
 
-            if (checkbox.checked) {
-                runScript();
-            }
-        }
-    }
+		const img = document.createElement('img');
+		img.src = thumbnailUrl;
+		img.loading = 'lazy';
+		img.style.maxHeight = '95px';
+		img.style.maxWidth = '200px';
+		img.style.margin = '5px';
 
-    init();
+		anchor.appendChild(img);
+		return anchor;
+	}
+
+	function thumbnailExists(url) {
+		return new Promise(resolve => {
+			const xhr = new XMLHttpRequest();
+			xhr.open('HEAD', url, true);
+			xhr.onload = function() {
+				resolve(xhr.status >= 200 && xhr.status < 400);
+			};
+			xhr.onerror = function() {
+				resolve(false);
+			};
+			xhr.send();
+		});
+	}
+
+	function swapJpgPngExtension(url) {
+		if (url.endsWith('.jpg')) {
+			return url.slice(0, -4) + '.png';
+		}
+
+		if (url.endsWith('.png')) {
+			return url.slice(0, -4) + '.jpg';
+		}
+
+		return url;
+	}
+
+	function getThumbnailCandidates(url) {
+		const found = findInstanceMatch(url);
+		if (!found) {
+			return [];
+		}
+
+		const instance = found.instance;
+		const match = found.match;
+		const wildcardValues = match.slice(1);
+		let thumbDir = instance.thumbDir;
+
+		for (const value of wildcardValues) {
+			thumbDir = thumbDir.replace('*', value);
+		}
+
+		const remainder = url.slice(match[0].length);
+		const fileWithoutExtension = remainder.replace(/\.[^.\/?#]+([?#].*)?$/, '');
+		const primaryUrl = thumbDir + fileWithoutExtension + instance.thumb_suffix + '.' + instance.thumbnailExtension;
+		const alternateUrl = swapJpgPngExtension(primaryUrl);
+
+		if (alternateUrl !== primaryUrl) {
+			return [primaryUrl, alternateUrl];
+		}
+
+		return [primaryUrl];
+	}
+
+	function clearExistingThumbnailContainers() {
+		document.querySelectorAll('.twintail-thumbnail-container').forEach(container => {
+			container.remove();
+		});
+	}
+
+	async function runScript() {
+		clearExistingThumbnailContainers();
+
+		const postContents = document.querySelectorAll('.contents pre.msgnormal, .msgtree .ngline');
+
+		for (const postContent of postContents) {
+			const links = postContent.querySelectorAll('a');
+			const twintailLinks = [];
+
+			links.forEach(link => {
+				const parentLine = link.closest('span.q') || link.parentElement;
+				if (!parentLine) {
+					return;
+				}
+
+				const lineContent = parentLine.textContent.trim();
+				const previousSiblingText = link.previousSibling && typeof link.previousSibling.textContent === 'string'
+					? link.previousSibling.textContent.trim()
+					: '';
+
+				if (lineContent.startsWith('>') && previousSiblingText.startsWith('>')) {
+					return;
+				}
+
+				if (findInstanceMatch(link.href)) {
+					twintailLinks.push(link.href);
+				}
+			});
+
+			if (twintailLinks.length === 0) {
+				continue;
+			}
+
+			const thumbContainer = document.createElement('div');
+			thumbContainer.className = 'twintail-thumbnail-container';
+			thumbContainer.style.marginTop = '10px';
+
+			for (const url of twintailLinks) {
+				const candidates = getThumbnailCandidates(url);
+				if (candidates.length === 0) {
+					continue;
+				}
+
+				let workingThumbnailUrl = null;
+
+				for (const candidate of candidates) {
+					if (await thumbnailExists(candidate)) {
+						workingThumbnailUrl = candidate;
+						break;
+					}
+				}
+
+				if (workingThumbnailUrl) {
+					thumbContainer.appendChild(createThumbnail(workingThumbnailUrl, url));
+				}
+			}
+
+			if (thumbContainer.childNodes.length > 0) {
+				postContent.appendChild(thumbContainer);
+			}
+		}
+	}
+
+	function init() {
+		addCheckbox();
+
+		const checkbox = document.getElementById('enableThumbnails');
+		if (!checkbox) {
+			return;
+		}
+
+		checkbox.addEventListener('change', function() {
+			const isChecked = checkbox.checked;
+			localStorage.setItem('enableThumbnails', String(isChecked));
+
+			if (isChecked) {
+				runScript();
+			} else {
+				clearExistingThumbnailContainers();
+			}
+		});
+
+		if (checkbox.checked) {
+			runScript();
+		}
+	}
+
+	init();
 })();

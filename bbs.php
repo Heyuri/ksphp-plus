@@ -20,7 +20,7 @@ The instructions have been moved to readme.md.
 require_once("./conf.php");
 
 // Version (for copyright notice)
-$CONF['VERSION'] = '[20251109] (<span title="Heyuri Applicable Research & Development">Heyuri</span>, <span title="Hiru-ga-take">ヶ</span>, ＠Links, <span title="Giko-neko">擬古猫</span>)';
+$CONF['VERSION'] = '[20260315] (<span title="Heyuri Applicable Research & Development">Heyuri</span>, <span title="Hiru-ga-take">ヶ</span>, ＠Links, <span title="Giko-neko">擬古猫</span>)';
 
 /* Launch */
 

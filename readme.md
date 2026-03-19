@@ -194,6 +194,10 @@ m=u     Execute UNDO
 ### 2026/03/10
 * Administrator keys can now be combined with a tripcode, implemented by gikonekos(擬古猫)
 
+### 2026/03/15
+* The way to enter administration menu is changed to a link at top
+* Administrator menu is reworked, it was also changed to use sessions for security and convenience
+
 ## ToDo:
 * View posts by thread
 * Improve speed of unread on tree view

@@ -46,25 +46,25 @@ class Bbsadmin extends Webapp {
      * メイン処理
      */
     function main() {
+        // 管理者セッションの場合のみアクセスを許可する
+        if (!isModerator()) {
+            header('Location: ' . $this->c['CGIURL'] . '?m=login');
+            exit();
+        }
 
         if (!defined('BBS_ACTIVATED')) {
-
             # 実行時間測定開始
             $this->setstarttime();
-
             # フォーム取得前処理
             $this->procForm();
-
             # 個人用設定反映
             $this->refcustom();
             $this->setusersession();
-
             # gzip圧縮転送
             if ($this->c['GZIPU']) {
                 ob_start("ob_gzhandler");
             }
         }
-
         # ログファイル閲覧
         if (@$this->f['ad'] == 'l') {
             $this->prtlogview(TRUE);
@@ -77,6 +77,9 @@ class Bbsadmin extends Webapp {
         else if (@$this->f['ad'] == 'x') {
             if (isset($this->f['x'])) {
                 $this->killmessage($this->f['x']);
+                // 再送信を防ぐため、メッセージ削除リストにリダイレクトする
+                header('Location: ' . $this->c['CGIURL'] . '?m=ad&ad=k');
+                exit();
             }
             $this->prtkilllist();
         }
@@ -96,7 +99,6 @@ class Bbsadmin extends Webapp {
         else {
             $this->prtadminmenu();
         }
-
 
         if (!defined('BBS_ACTIVATED') and $this->c['GZIPU']) {
             ob_end_flush();

@@ -16,6 +16,7 @@ $MSG = array(
     /* 投稿 / 入力チェック */
     'POSTING_SUSPENDED'       => 'この掲示板は現在投稿機能停止中です。',
     'ADMIN_ONLY_POSTING'      => '掲示板への投稿は管理者のみ許可されています。',
+    'ADMIN_POST_DISABLED'     => '投稿フォームからの管理者アクセスは無効です。「管理画面」リンクを使用してください。',
     'BAD_REFERER'             => '投稿画面のＵＲＬが <br>{REFCHECKURL}<br>以外からの投稿はできません。',
     'POST_TOO_WIDE'           => '投稿内容の桁数が大きすぎます。',
     'POST_TOO_MANY_LINES'     => '投稿内容の行数が大きすぎます。',
