@@ -73,6 +73,12 @@ class Bbsadmin extends Webapp {
         else if (@$this->f['ad'] == 'k') {
             $this->prtkilllist();
         }
+        # ログアウト処理
+        else if (@$this->f['ad'] == 'logout') {
+            $this->logout();
+            header('Location: ' . $this->c['CGIURL']);
+            exit();
+        }
         # メッセージ削除処理
         else if (@$this->f['ad'] == 'x') {
             if (isset($this->f['x'])) {
@@ -164,6 +170,22 @@ class Bbsadmin extends Webapp {
         print $this->prthtmlhead ($this->c['BBSTITLE'] . ' メッセージ削除モード');
         $this->t->displayParsedTemplate('killlist');
         print $this->prthtmlfoot ();
+    }
+
+
+
+
+
+    /**
+     * ログアウト処理
+     *
+     */
+    function logout() {
+        // セッションデータをクリア
+        $_SESSION = array();
+
+        // セッションを破棄
+        session_destroy();
     }
 
 
