@@ -31,6 +31,13 @@
 	<input type="submit" value="Server PHP configuration information" class="btn" />
 </form>
 <br>
+<form method="GET" action="{CGIURL}">
+	<input type="hidden" name="m" value="ad" />
+	<input type="hidden" name="ad" value="logout" />
+	<input type="hidden" name="v" value="{V}" />
+	<input type="submit" value="Logout" class="btn" />
+</form>
+<br>
 <form method="post" action="{CGIURL}">
 	<input type="submit" value="Close" class="btn" />
 </form>

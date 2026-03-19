@@ -73,6 +73,12 @@ class Bbsadmin extends Webapp {
         else if (@$this->f['ad'] == 'k') {
             $this->prtkilllist();
         }
+        # Logout process
+        else if (@$this->f['ad'] == 'logout') {
+            $this->logout();
+            header('Location: ' . $this->c['CGIURL']);
+            exit();
+        }
         # Message deletion process
         else if (@$this->f['ad'] == 'x') {
             if (isset($this->f['x'])) {
@@ -164,6 +170,22 @@ class Bbsadmin extends Webapp {
         print $this->prthtmlhead ($this->c['BBSTITLE'] . ' Message deletion mode');
         $this->t->displayParsedTemplate('killlist');
         print $this->prthtmlfoot ();
+    }
+
+
+
+
+
+    /**
+     * Logout process
+     *
+     */
+    function logout() {
+        // Clear session data
+        $_SESSION = array();
+
+        // Destroy the session
+        session_destroy();
     }
 
 
