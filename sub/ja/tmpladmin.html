@@ -32,6 +32,13 @@
 	<input type="submit" value="サーバーのPHP設定情報" class="btn" />
 </form>
 <br>
+<form method="GET" action="{CGIURL}">
+	<input type="hidden" name="m" value="ad" />
+	<input type="hidden" name="ad" value="logout" />
+	<input type="hidden" name="v" value="{V}" />
+	<input type="submit" value="ログアウト" class="btn" />
+</form>
+<br>
 <form method="post" action="{CGIURL}">
 	<input type="submit" value="終了" class="btn" />
 </form>
