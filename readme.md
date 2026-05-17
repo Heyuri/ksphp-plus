@@ -63,15 +63,18 @@ but if it runs as CGI, bbs.php needs to be set to 755 (executable).
 
 ## Memo:
 ### List of bbs.php?m=* meanings
-m=g     Message log search
-m=ad    Administrator mode
-m=tree  Tree view
-m=p     Post/reload
-m=c     Settings
-m=f     Follow screen
-m=t     Thread display
-m=s     Search by user
-m=u     Execute UNDO
+
+| Parameter | Meaning |
+| --- | --- |
+| m=g | Message log search |
+| m=ad | Administrator mode |
+| m=tree | Tree view |
+| m=p | Post/reload |
+| m=c | Settings |
+| m=f |Follow screen |
+| m=t |Thread display |
+| m=s |Search by user |
+| m=u |Execute UNDO |
 
 ## History
 ### Cion (しおん) version
