@@ -201,6 +201,9 @@ but if it runs as CGI, bbs.php needs to be set to 755 (executable).
 * The way to enter administration menu is changed to a link at top
 * Administrator menu is reworked, it was also changed to use sessions for security and convenience
 
+### 2026/06/27
+* Added filtering and mass-selection helpers to the post deletion admin screen
+
 ## ToDo:
 * View posts by thread
 * Improve speed of unread on tree view
