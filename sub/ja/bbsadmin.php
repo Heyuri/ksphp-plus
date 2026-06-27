@@ -161,7 +161,7 @@ class Bbsadmin extends Webapp {
         $this->t->addRows('killmessage', $messages);
 
         $this->sethttpheader();
-        print $this->prthtmlhead ($this->c['BBSTITLE'] . ' メッセージ削除モード');
+        print $this->prthtmlhead ($this->c['BBSTITLE'] . ' メッセージ削除モード', '<script type="text/javascript" src="js/admin.js" defer></script>');
         $this->t->displayParsedTemplate('killlist');
         print $this->prthtmlfoot ();
     }
