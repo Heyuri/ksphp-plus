@@ -1,14 +1,3 @@
-// ==UserScript==
-// @name         Heyuri Strange World — deletion-mode helper
-// @namespace    https://heyuri.net/
-// @version      1.3.0
-// @description  Range + shift-click checkbox selection and click-to-filter by host (IP) or username on the Strange World post-deletion page. Works on the EN and JP versions.
-// @match        https://dis.heyuri.net/sw/bbs.php*
-// @match        https://sys.heyuri.net/sw/new/bbs.php*
-// @run-at       document-idle
-// @grant        none
-// ==/UserScript==
-
 (function () {
   'use strict';
 
