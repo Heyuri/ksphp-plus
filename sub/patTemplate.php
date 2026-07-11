@@ -46,6 +46,7 @@ define( "patTEMPLATE_TYPE_SIMPLECONDITION", "SIMPLECONDITION" );
 * @author		Stephan Schmidt <schst@php-tools.de>
 * @version		2.4 ($Id: patTemplate.php,v 1.54 2001/11/03 13:34:16 schst Exp $)
 */
+#[\AllowDynamicProperties]
 class	patTemplate
 {
 
@@ -575,7 +576,7 @@ function	setType( $type = "" )
 				$this->template_names[$this->depth]			=	$tmpl_name;
 				
 				//	Check, if attribute "type" was found
-				if( $tmpl_type	=	strtoupper( $attributes['type'] ) )
+				if( $tmpl_type	=	strtoupper( $attributes['type'] ?? '' ) )
 				{
 					$this->template_types[$this->depth]		=	$tmpl_type;
 					$attributes['type']						=	$tmpl_type;
@@ -657,7 +658,7 @@ function	setType( $type = "" )
 				if	( $this->depth > 0 )
 				{
 					//	Is there a placeholder attribute?
-					if( $placeholder = strtoupper( $attributes['placeholder'] ) )
+					if( $placeholder = strtoupper( $attributes['placeholder'] ?? '' ) )
 					{
 						//	placeholder="none" found => DO NOT PUT A PLACEHOLDER IN THE PARENT TEMPLATE!
 						if( $placeholder != "NONE" )
@@ -1131,7 +1132,7 @@ function	setType( $type = "" )
 			}
 		}
 
-		if( $scope = strtoupper( $this->getAttribute( $template, "varscope" ) ) )
+		if( $scope = strtoupper( $this->getAttribute( $template, "varscope" ) ?? '' ) )
 		{
 			$parentVars		=	$this->getVars( $scope );
 			reset( $parentVars );

@@ -1157,13 +1157,13 @@ class Bbs extends Webapp {
             # Counter
             if ($this->c['SHOW_COUNTER']) {
                 $counter = $this->counter();
-                $counter = number_format($counter);
+                if (is_numeric($counter)) { $counter = number_format((int)$counter); }
                 $this->t->addVar("counter", 'COUNTER', $counter);
                 $this->t->setAttribute("counter", "visibility", "visible");
             }
             if ($this->c['CNTFILENAME']) {
                 $mbrcount = $this->mbrcount();
-                $mbrcount = number_format($mbrcount);
+                if (is_numeric($mbrcount)) { $mbrcount = number_format((int)$mbrcount); }
                 $this->t->addVar("mbrcount", 'MBRCOUNT', $mbrcount);
                 $this->t->setAttribute("mbrcount", "visibility", "visible");
             }
@@ -2567,7 +2567,7 @@ class Func {
 
         if (!preg_match("/^\w+$/", $value)) {
             $value = strtr($value, array_flip(get_html_translation_table(HTML_ENTITIES)));
-            $value = preg_replace("/&#([0-9]+);/me", "chr('\\1')", $value);
+            $value = preg_replace_callback("/&#([0-9]+);/m", function($m){ return chr((int)$m[1]); }, $value);
         }
         return $value;
     }
@@ -2601,7 +2601,7 @@ class Func {
      * @return  String  Character string after formatting
      */
     public static function fixnumberstr($numberstr) {
-        $numberstr = trim($numberstr);
+        $numberstr = trim($numberstr ?? '');
         $twobytenumstr = array ('０', '１', '２', '３', '４', '５', '６', '７', '８', '９', );
         for ($i = 0; $i < count($twobytenumstr); $i++) {
             $numberstr = str_replace($twobytenumstr[$i], "$i", $numberstr);

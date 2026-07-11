@@ -121,7 +121,7 @@ class Bbsadmin extends Webapp {
      */
     function prtadminmenu() {
 
-        $this->t->addVar('adminmenu', 'V', trim($this->f['v']));
+        $this->t->addVar('adminmenu', 'V', trim($this->f['v'] ?? ''));
 
         $this->sethttpheader();
         print $this->prthtmlhead ($this->c['BBSTITLE'] . ' 管理メニュー');
@@ -145,7 +145,7 @@ class Bbsadmin extends Webapp {
         }
         $logdata = file($this->c['LOGFILENAME']);
 
-        $this->t->addVar('killlist', 'V', trim($this->f['v']));
+        $this->t->addVar('killlist', 'V', trim($this->f['v'] ?? ''));
 
         $messages = array();
         foreach ($logdata as $logline) {
@@ -333,7 +333,7 @@ class Bbsadmin extends Webapp {
      */
     function prtsetpass() {
 
-        $this->t->addVar('setpass', 'V', trim($this->f['v']));
+        $this->t->addVar('setpass', 'V', trim($this->f['v'] ?? ''));
 
         $this->sethttpheader();
         print $this->prthtmlhead ($this->c['BBSTITLE'] . ' パスワード設定画面');
