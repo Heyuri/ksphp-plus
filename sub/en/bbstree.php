@@ -378,7 +378,7 @@ class Treeview extends Bbs {
                 $treemsg['MSG'] = rtrim($treemsg['MSG']);
 
                 #20181117 Gikoneko: Personal word filter
-                $treemsg['MSG']  = preg_replace("/(.+)/","<span class= \"ngline\">$1</span>\r", $treemsg['MSG']);
+                $treemsg['MSG']  = preg_replace("/(.+)/","<div class= \"ngline\">$1</div>\r", $treemsg['MSG']);
 
                 # Link to the follow-up post page
                 $treeprint .= "<a href=\"{$this->s['DEFURL']}&amp;m=f&amp;s={$parentid}\" target=\"link\">{$this->c['TXTFOLLOW']}</a>";

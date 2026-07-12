@@ -378,7 +378,7 @@ class Treeview extends Bbs {
                 $treemsg['MSG'] = rtrim($treemsg['MSG']);
 
                 #20181117 擬古猫 個別NG
-                $treemsg['MSG']  = preg_replace("/(.+)/","<span class= \"ngline\">$1</span>\r", $treemsg['MSG']);
+                $treemsg['MSG']  = preg_replace("/(.+)/","<div class= \"ngline\">$1</div>\r", $treemsg['MSG']);
 
                 # フォロー画面へのリンク
                 $treeprint .= "<a href=\"{$this->s['DEFURL']}&amp;m=f&amp;s={$parentid}\" target=\"link\">{$this->c['TXTFOLLOW']}</a>";
