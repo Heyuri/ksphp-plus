@@ -193,44 +193,21 @@ class Treeview extends Bbs {
 
         $threadindex = 0;
 
+        #20260716 the log is now grouped into threads in a single pass
+        #instead of rescanning and re-parsing the whole log once per thread.
+        list($order, $buckets, $newest) = $this->indexthreads($logdata);
+
         # Process in order of threads with the latest post time
-        while (count($logdata) > 0) {
-
-            $msgcurrent = $this->getmessage(array_shift($logdata));
-            if (!$msgcurrent['THREAD']) {
-                $msgcurrent['THREAD'] = $msgcurrent['POSTID'];
-            }
-
-            # Extract threads from $logdata and create message array $thread
-            $thread = array($msgcurrent);
-            $i = 0;
-            while ($i < count($logdata)) {
-                $message = $this->getmessage($logdata[$i]);
-                if ($message['THREAD'] == $msgcurrent['THREAD']
-                    or $message['POSTID'] == $msgcurrent['THREAD']) {
-                    array_splice($logdata, $i, 1);
-                    $thread[] = $message;
-                    # Detect root
-                    if ($message['POSTID'] == $message['THREAD'] or !$message['THREAD']) {
-                        break;
-                    }
-                }
-                else {
-                    $i++;
-                }
-            }
+        foreach ($order as $tid) {
 
             # Unread reload
+            #20260716 threads are walked newest-update-first, so once a
+            #thread has no unread post, no later thread can have one -> break.
+            #$newest[$tid] is that thread's highest POSTID, so this is the same
+            #test the old per-message loop performed, without parsing anything.
             if ($isreadnew) {
-                $hit = FALSE;
-                for ($i = 0; $i < count($thread); $i++) {
-                    if ($thread[$i]['POSTID'] > $this->f['p']) {
-                        $hit = TRUE;
-                        break;
-                    }
-                }
-                if (!$hit) {
-                    continue;
+                if (!($newest[$tid] > $this->f['p'])) {
+                    break;
                 }
             }
             else if ($this->s['MSGDISP'] < 0) {
@@ -241,6 +218,16 @@ class Treeview extends Bbs {
                 $threadindex++;
                 continue;
             }
+
+            # Only threads that are actually displayed get fully parsed
+            $thread = array();
+            foreach ($buckets[$tid] as $logline) {
+                $thread[] = $this->getmessage($logline);
+            }
+            if (!$thread[0]['THREAD']) {
+                $thread[0]['THREAD'] = $thread[0]['POSTID'];
+            }
+            $msgcurrent = $thread[0];
 
             # Extract reference IDs from "reference"
             #20260716 Gikoneko: foreach was by-value, so the recovered REFID never
@@ -280,7 +267,10 @@ class Treeview extends Bbs {
         else {
             $msgmore = 'There are no unread messages. ';
         }
-        if (count($logdata) == 0) {
+        #20260716 this used to test count($logdata)==0, which only worked
+        #because the old loop destructively consumed the log array. It compares
+        #thread progress against the thread count instead.
+        if ($threadindex >= count($order)) {
             $msgmore .= 'There are no threads below this point.';
         }
         $this->t->addVar('treeview_lower', 'MSGMORE', $msgmore);
@@ -312,6 +302,59 @@ class Treeview extends Bbs {
 
 
 
+
+
+    /**
+     * Build a thread index from the raw log in a single pass.
+     *
+     * Only the first four CSV fields (NDATE,POSTID,PROTECT,THREAD) are read here.
+     * That is safe and cheap: those fields are always numeric, and
+     * Func::html_escape() converts every comma in user input to "&#44;" before a
+     * line is ever written, so a plain explode() cannot be thrown off by post
+     * content. getmessage() is therefore only called on threads actually rendered.
+     *
+     * A reply always inherits its parent's THREAD field (see putmessage), falling
+     * back to the parent's POSTID when the parent is a legacy root with an empty
+     * THREAD. So "THREAD, or POSTID when THREAD is empty" identifies the thread of
+     * any line, which is what the old scan spent its time rediscovering.
+     *
+     * @param   Array   $logdata  Raw log line array (newest first)
+     * @return  Array   $order    Thread IDs, in order of most recent update
+     * @return  Array   $buckets  Thread ID => raw log lines (newest first)
+     * @return  Array   $newest   Thread ID => highest POSTID in that thread
+     */
+    function indexthreads(&$logdata) {
+
+        $order   = array();
+        $buckets = array();
+        $newest  = array();
+
+        foreach ($logdata as $logline) {
+
+            # Same guard as getmessage(): a valid line has at least 10 fields.
+            if (substr_count($logline, ',') < 9) {
+                continue;
+            }
+
+            $items  = explode(',', $logline, 5);
+            $postid = $items[1];
+            $tid    = $items[3];
+            if (!$tid) {
+                $tid = $postid;
+            }
+
+            if (!isset($buckets[$tid])) {
+                $buckets[$tid] = array();
+                $order[]       = $tid;
+                # The log is strictly newest-first, so the first line seen for a
+                # thread carries its highest POSTID.
+                $newest[$tid]  = $postid;
+            }
+            $buckets[$tid][] = $logline;
+        }
+
+        return array($order, $buckets, $newest);
+    }
 
 
     /**
