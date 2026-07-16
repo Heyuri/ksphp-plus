@@ -243,7 +243,9 @@ class Treeview extends Bbs {
             }
 
             #「参考」からの参照ID抽出
-            foreach ($thread as $message) {
+            #20260716 擬古猫 foreachが値渡しのため$threadへ反映されず、
+            #REFIDフィールドを持たない旧投稿がツリーから欠落する不具合を修正（参照渡しに変更）
+            foreach ($thread as &$message) {
                 if (!@$message['REFID']) {
                     if (preg_match("/<a href=\"m=f&s=(\d+)[^>]+>([^<]+)<\/a>$/i", $message['MSG'], $matches)) {
                         $message['REFID'] = $matches[1];
@@ -253,6 +255,7 @@ class Treeview extends Bbs {
                     }
                 }
             }
+            unset($message);
 
             # $thread のテキストツリーを出力
             $this->prttexttree($msgcurrent, $thread);
@@ -378,7 +381,7 @@ class Treeview extends Bbs {
                 $treemsg['MSG'] = rtrim($treemsg['MSG']);
 
                 #20181117 擬古猫 個別NG
-                $treemsg['MSG']  = preg_replace("/(.+)/","<div class= \"ngline\">$1</div>\r", $treemsg['MSG']);
+                $treemsg['MSG']  = preg_replace("/(.+)/","<span class= \"ngline\">$1</span>\r", $treemsg['MSG']);
 
                 # フォロー画面へのリンク
                 $treeprint .= "<a href=\"{$this->s['DEFURL']}&amp;m=f&amp;s={$parentid}\" target=\"link\">{$this->c['TXTFOLLOW']}</a>";
