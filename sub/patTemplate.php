@@ -724,7 +724,7 @@ function	setType( $type = "" )
 *	@param	string	$tagname	name of the start tag that was found
 *	@param	string	$line		the complete line containing the tag
 */
-	function	endElementHandler( $fname, $tagname, $line )
+	function	endElementHandler( $fname, $tagname, $line, $lineno )
 	{
 		array_pop( $this->whitespace );
 
@@ -847,7 +847,7 @@ function	setType( $type = "" )
 	function	addRows( $template, $rows, $prefix="" )
 	{
 		//	Store the vars in this array
-		$newvars	=	array();
+		$new_vars	=	array();
 		
 		//	get amount of rows		
 		$cnt_rows	=	count( $rows );
@@ -1283,6 +1283,7 @@ function	setType( $type = "" )
 			//	No dependencies, but more than one => return all parsed templates in an array
 			else
 			{
+				$arr	=	array();
 				for	( $i = 0; $i < $this->cnt_templates; $i++ )
 					{
 					$arr[$this->templates[$i]]	=	$this->getParsedTemplate( $this->templates[$i] );
