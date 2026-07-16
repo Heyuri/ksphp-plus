@@ -57,6 +57,9 @@ class PHPZip
 
 	function GetFileList($dir)
 	{
+		#20260717 Gikoneko: $file was read/returned without ever being initialized
+		#(the original guard only covered the file_exists() branch, not the final return)
+		$file = array();
 		if (file_exists($dir))
 		{
 			$args = func_get_args();
