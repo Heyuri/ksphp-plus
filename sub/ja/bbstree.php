@@ -79,7 +79,7 @@ class Treeview extends Bbs {
 
         # 個人用設定反映
         if (@$this->f['treem'] == 'p') {
-            $this->f['m'] = 'p';
+            @$this->f['m'] = 'p';
         }
         $this->refcustom();
         $this->setusersession();
@@ -90,7 +90,7 @@ class Treeview extends Bbs {
         }
 
         # 書き込み処理
-        if (@$this->f['treem'] == 'p' and trim(@$this->f['v'])) {
+        if (@$this->f['treem'] == 'p' and trim(@$this->f['v'] ?? '')) {
 
             # 環境変数取得
             $this->setuserenv();
@@ -206,7 +206,7 @@ class Treeview extends Bbs {
             #$newest[$tid]はそのスレッドの最大POSTIDなので、旧コードの
             #メッセージ毎のループと同じ判定を、解析なしで行える。
             if ($isreadnew) {
-                if (!($newest[$tid] > $this->f['p'])) {
+                if (!($newest[$tid] > @$this->f['p'])) {
                     break;
                 }
             }
@@ -367,7 +367,9 @@ class Treeview extends Bbs {
         print "<pre class=\"msgtree\"><a href=\"{$this->s['DEFURL']}&amp;m=t&amp;s={$msgcurrent['THREAD']}\" target=\"link\">{$this->c['TXTTHREAD']}</a>";
         $msgcurrent['WDATE'] = Func::getdatestr($msgcurrent['NDATE']);
         print "<span class=\"update\"> [更新日：{$msgcurrent['WDATE']}]</span>\r";
-        $tree =& $this->gentree(array_reverse($thread), $msgcurrent['THREAD']);
+        #20260717 Gikoneko: avoid "Only variables should be passed by reference" notice
+        $reversedthread = array_reverse($thread);
+        $tree =& $this->gentree($reversedthread, $msgcurrent['THREAD']);
         $tree = str_replace("</span><span class=\"bc\">", "", $tree);
         $tree = str_replace("</span>　<span class=\"bc\">", "　", $tree);
         $tree = '　' . str_replace("\r", "\r　", $tree);
@@ -435,7 +437,7 @@ class Treeview extends Bbs {
                 }
 
                 # 新着表示
-                if (@$this->f['p'] > 0 and $treemsg['POSTID'] > $this->f['p']) {
+                if (@$this->f['p'] > 0 and $treemsg['POSTID'] > @$this->f['p']) {
                     $treemsg['MSG'] = '<span class="newmsg">' . $treemsg['MSG'] . '</span>';
                 }
 
@@ -541,7 +543,7 @@ class Treeview extends Bbs {
         if ((@$this->f['readnew'] or ($msgdisp == '0' )) and @$this->f['p'] > 0) {
             $bindex = 0;
 #            $eindex = 0;
-      $eindex = $toppostid - $this->f['p'];
+      $eindex = $toppostid - @$this->f['p'];
         }
 
         # 最後のページの場合、切り詰め

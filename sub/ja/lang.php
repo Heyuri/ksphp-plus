@@ -8,6 +8,7 @@ $MSG = array(
 
     /* 汎用 / 入出力エラー */
     'FAILED_TO_READ_MESSAGE'  => 'メッセージ読み込みに失敗しました',
+    'FILE_AUTOCREATED'        => '%sが見つからなかったため、新規に作成しました。',
     'FAILED_TO_OPEN_LOG' => '%sを開けませんでした。',
     'FAILED_TO_OUTPUT_LOG'    => '過去ログ出力に失敗しました',
     'OLDLOG_TOO_LARGE'        => '過去ログファイルがサイズ制限を超えています',
