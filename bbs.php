@@ -148,8 +148,8 @@ function script_run() {
         $bbsadmin->procForm();
         $bbsadmin->refcustom();
         $bbsadmin->setusersession();
-        if ($_POST['ad'] == 'ps') {
-            $bbsadmin->prtpass($_POST['ps']);
+        if (@$_POST['ad'] == 'ps') {
+            $bbsadmin->prtpass(@$_POST['ps']);
         }
         else {
             $bbsadmin->prtsetpass();
@@ -157,7 +157,7 @@ function script_run() {
     }
 
     # Admin/mod login page (GET: ?m=login)
-    elseif ($_GET['m'] == 'login') {
+    elseif (@$_GET['m'] == 'login') {
         if (isModerator()) {
             header('Location: ' . $CONF['CGIURL'] . '?m=ad');
             exit();
@@ -175,8 +175,8 @@ function script_run() {
         exit();
     }
     # Admin/mod login POST
-    elseif ($_POST['m'] == 'login') {
-        $pass = trim($_POST['adminpass'] ?? '');
+    elseif (@$_POST['m'] == 'login') {
+        $pass = trim(@$_POST['adminpass'] ?? '');
         $is_mod = false;
         if (crypt($pass, $CONF['ADMINPOST']) === $CONF['ADMINPOST']) {
             $is_mod = true;
@@ -202,24 +202,24 @@ function script_run() {
         }
     }
     # Admin mode (GET: ?m=ad) - session required
-    elseif ($_REQUEST['m'] == 'ad' && isModerator()) {
+    elseif (@$_REQUEST['m'] == 'ad' && isModerator()) {
         require_once(PHP_BBSADMIN);
         $bbsadmin = new Bbsadmin();
         $bbsadmin->main();
     }
     # Message log search mode (sub/bbslog.php)
-    elseif ($_GET['m'] == 'g' or $_POST['m'] == 'g') {
+    elseif (@$_GET['m'] == 'g' or @$_POST['m'] == 'g') {
         require_once(PHP_GETLOG);
         $getlog = new Getlog();
         $getlog->main();
     }
     # Legacy admin POST (disable: always redirect to login)
-    elseif ($_POST['m'] == 'ad') {
+    elseif (@$_POST['m'] == 'ad') {
         header('Location: ' . $CONF['CGIURL'] . '?m=login');
         exit();
     }
     # Tree view (sub/bbstree.php)
-    elseif ($_GET['m'] == 'tree' or $_POST['m'] == 'tree') {
+    elseif (@$_GET['m'] == 'tree' or @$_POST['m'] == 'tree') {
         require_once(PHP_TREEVIEW);
         $treeview = new Treeview();
         $treeview->main();
@@ -363,7 +363,7 @@ function tripuse($key) {
             $trip = substr(crypt($match[2], $salt),-10);
         }
     #	$match[1] = str_replace("◆", "◇", $match[1]);
-    #	$_POST['FROM'] = $match[1]."</b> ◆".$trip."<b>";
+    #	@$_POST['FROM'] = $match[1]."</b> ◆".$trip."<b>";
     $trip ="◆".$trip;
     } else {
         $trip = str_replace("◆", "◇", $key);
@@ -377,14 +377,14 @@ function tripuse($key) {
      * Form acquisition preprocessing
      */
     function procForm() {
-        if (!$this->c['BBSMODE_IMAGE'] and $_SERVER['CONTENT_LENGTH'] > $this->c['MAXMSGSIZE'] * 5) {
+        if (!$this->c['BBSMODE_IMAGE'] and @$_SERVER['CONTENT_LENGTH'] > $this->c['MAXMSGSIZE'] * 5) {
             $this->prterror(T('POST_TOO_LARGE'));
         }
-        if ($this->c['BBSHOST'] and $_SERVER['HTTP_HOST'] != $this->c['BBSHOST']) {
+        if ($this->c['BBSHOST'] and @$_SERVER['HTTP_HOST'] != $this->c['BBSHOST']) {
             $this->prterror(T('INVALID_CALLER'));
         }
         # Limited to POST or GET only
-        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+        if (@$_SERVER['REQUEST_METHOD'] == 'POST') {
             $this->f = $_POST;
         }
         else {
@@ -409,14 +409,14 @@ function tripuse($key) {
      */
     function setusersession() {
 
-        $this->s['U'] = $this->f['u'];
-        $this->s['I'] = $this->f['i'];
-        $this->s['C'] = $this->f['c'];
-        $this->s['MSGDISP'] = $this->f['d'];
-        $this->s['TOPPOSTID'] = $this->f['p'];
+        $this->s['U'] = @$this->f['u'];
+        $this->s['I'] = @$this->f['i'];
+        $this->s['C'] = @$this->f['c'];
+        $this->s['MSGDISP'] = @$this->f['d'];
+        $this->s['TOPPOSTID'] = @$this->f['p'];
         # Get settings information cookies
-        if ($this->c['COOKIE'] and $_COOKIE['c']
-            and preg_match("/u=([^&]*)&i=([^&]*)&c=([^&]*)/", $_COOKIE['c'], $matches)) {
+        if ($this->c['COOKIE'] and @$_COOKIE['c']
+            and preg_match("/u=([^&]*)&i=([^&]*)&c=([^&]*)/", @$_COOKIE['c'], $matches)) {
             if (!isset($this->f['u'])) {
                 $this->s['U'] = urldecode($matches[1]);
             }
@@ -428,8 +428,8 @@ function tripuse($key) {
             }
         }
         # Get cookie for the UNDO button
-        if ($this->c['COOKIE'] and $this->c['ALLOW_UNDO'] and $_COOKIE['undo']
-            and preg_match("/p=([^&]*)&k=([^&]*)/", $_COOKIE['undo'], $matches)) {
+        if ($this->c['COOKIE'] and $this->c['ALLOW_UNDO'] and @$_COOKIE['undo']
+            and preg_match("/p=([^&]*)&k=([^&]*)/", @$_COOKIE['undo'], $matches)) {
             $this->s['UNDO_P'] = $matches[1];
             $this->s['UNDO_K'] = $matches[2];
         }
@@ -464,6 +464,51 @@ function tripuse($key) {
         if (isset($this->s['DEFURL'])) {
             $this->t->setAttribute('backnavi', 'visibility', 'visible');
         }
+        $this->t->displayParsedTemplate('error');
+        print $this->prthtmlfoot ();
+        $this->destroy();
+        exit();
+    }
+
+    /**
+     * 20260717 Gikoneko: create a required runtime file (e.g. the main log
+     * file) if it doesn't exist yet, instead of the caller having to
+     * hard-fail on first launch. Only ever call this with a fixed
+     * configuration path (never with a path built from user input).
+     *
+     * @access  public
+     * @param   String  $path            File path to ensure exists
+     * @param   String  $initialcontent  Content to write if the file is created
+     * @return  Boolean TRUE if the file was just created, FALSE if it already existed
+     */
+    function ensurefile($path, $initialcontent = '') {
+        if (file_exists($path)) {
+            return FALSE;
+        }
+        $dir = dirname($path);
+        if ($dir and $dir != '.' and !is_dir($dir)) {
+            @mkdir($dir, 0755, TRUE);
+        }
+        return @file_put_contents($path, $initialcontent) !== FALSE;
+    }
+
+    /**
+     * 20260717 Gikoneko: notify the user that one or more required runtime
+     * files were missing and have just been auto-created, then offer a
+     * link back to the board (always shown, unlike prterror() which only
+     * shows it when $this->s['DEFURL'] happens to already be set).
+     *
+     * @access  public
+     * @param   Array   $messages  List of already-translated notice strings
+     */
+    function prtfilecreated($messages) {
+        $this->sethttpheader();
+        print $this->prthtmlhead ($this->c['BBSTITLE'] . ' Notice');
+        $this->t->addVar('error', 'ERR_MESSAGE', implode('<br>', $messages));
+        if (!isset($this->s['DEFURL'])) {
+            $this->s['DEFURL'] = $this->c['CGIURL'];
+        }
+        $this->t->setAttribute('backnavi', 'visibility', 'visible');
         $this->t->displayParsedTemplate('error');
         print $this->prthtmlfoot ();
         $this->destroy();
@@ -577,8 +622,8 @@ function tripuse($key) {
             if ($this->c['BBSMODE_ADMINONLY'] != 1) {
                 $message['BTNFOLLOW'] = "$spacer<a href=\"{$this->c['CGIURL']}"
                     ."?m=f&amp;s={$message['POSTID']}&amp;".$this->s['QUERY'];
-                if ($this->f['w']) {
-                    $message['BTNFOLLOW'] .= "&amp;w=".$this->f['w'];
+                if (@$this->f['w']) {
+                    $message['BTNFOLLOW'] .= "&amp;w=".@$this->f['w'];
                 }
                 if ($mode == 1) {
                     $message['BTNFOLLOW'] .= "&amp;ff=$tlog";
@@ -590,8 +635,8 @@ function tripuse($key) {
             if ($message['USER'] != $this->c['ANONY_NAME'] and $this->c['BBSMODE_ADMINONLY'] != 1) {
                 $message['BTNAUTHOR'] = "$spacer<a href=\"{$this->c['CGIURL']}"
                     ."?m=s&amp;s=". urlencode(preg_replace("/<[^>]*>/", '', $message['USER'])) ."&amp;".$this->s['QUERY'];
-                if ($this->f['w']) {
-                    $message['BTNAUTHOR'] .= "&amp;w=".$this->f['w'];
+                if (@$this->f['w']) {
+                    $message['BTNAUTHOR'] .= "&amp;w=".@$this->f['w'];
                 }
                 if ($mode == 1) {
                     $message['BTNAUTHOR'] .= "&amp;ff=$tlog";
@@ -708,6 +753,12 @@ function tripuse($key) {
         }
         else {
             $logfilename = $this->c['LOGFILENAME'];
+            #20260717 Gikoneko: auto-create the main log file on first run
+            #(never do this for the old-log branch above, since that path
+            #is built from user input and must not auto-create arbitrary files)
+            if (!file_exists($logfilename) and $this->ensurefile($logfilename)) {
+                $this->prtfilecreated(array(sprintf(T('FILE_AUTOCREATED'), $logfilename)));
+            }
         }
         if (!file_exists($logfilename)) {
             $this->prterror(T('FAILED_TO_READ_MESSAGE'));
@@ -783,9 +834,9 @@ function tripuse($key) {
             'SHOWIMG',
         );
         # Update from settings string
-        if ($this->f['c']) {
+        if (@$this->f['c']) {
             $strflag = '';
-            $formc = $this->f['c'];
+            $formc = @$this->f['c'];
             if (strlen($formc) > 5) {
                 $formclen = strlen($formc);
                 $strflag = substr($formc, 0, 2);
@@ -815,21 +866,21 @@ function tripuse($key) {
             }
         }
         # Update settings information
-        if ($this->f['m'] == 'p' or $this->f['m'] == 'c' or $this->f['m'] == 'g') {
-            $this->f['a'] ? $this->c['AUTOLINK'] = 1 : $this->c['AUTOLINK'] = 0;
-            $this->f['g'] ? $this->c['GZIPU'] = 1 : $this->c['GZIPU'] = 0;
-            $this->f['loff'] ? $this->c['LINKOFF'] = 1 : $this->c['LINKOFF'] = 0;
-            $this->f['hide'] ? $this->c['HIDEFORM'] = 1 : $this->c['HIDEFORM'] = 0;
-            $this->f['sim'] ? $this->c['SHOWIMG'] = 1 : $this->c['SHOWIMG'] = 0;
-            if ($this->f['m'] == 'c') {
-                $this->f['fw'] ? $this->c['FOLLOWWIN'] = 1 : $this->c['FOLLOWWIN'] = 0;
-                $this->f['rt'] ? $this->c['RELTYPE'] = 1 : $this->c['RELTYPE'] = 0;
-                $this->f['cookie'] ? $this->c['COOKIE'] = 1 : $this->c['COOKIE'] = 0;
+        if (@$this->f['m'] == 'p' or @$this->f['m'] == 'c' or @$this->f['m'] == 'g') {
+            @$this->f['a'] ? $this->c['AUTOLINK'] = 1 : $this->c['AUTOLINK'] = 0;
+            @$this->f['g'] ? $this->c['GZIPU'] = 1 : $this->c['GZIPU'] = 0;
+            @$this->f['loff'] ? $this->c['LINKOFF'] = 1 : $this->c['LINKOFF'] = 0;
+            @$this->f['hide'] ? $this->c['HIDEFORM'] = 1 : $this->c['HIDEFORM'] = 0;
+            @$this->f['sim'] ? $this->c['SHOWIMG'] = 1 : $this->c['SHOWIMG'] = 0;
+            if (@$this->f['m'] == 'c') {
+                @$this->f['fw'] ? $this->c['FOLLOWWIN'] = 1 : $this->c['FOLLOWWIN'] = 0;
+                @$this->f['rt'] ? $this->c['RELTYPE'] = 1 : $this->c['RELTYPE'] = 0;
+                @$this->f['cookie'] ? $this->c['COOKIE'] = 1 : $this->c['COOKIE'] = 0;
             }
         }
         # Special conditions
         if ($this->c['BBSMODE_ADMINONLY'] != 0) {
-            ($this->f['m'] == 'f' or ($this->f['m'] == 'p' and $this->f['write'])) ? $this->c['HIDEFORM'] = 0 : $this->c['HIDEFORM'] = 1;
+            (@$this->f['m'] == 'f' or (@$this->f['m'] == 'p' and @$this->f['write'])) ? $this->c['HIDEFORM'] = 0 : $this->c['HIDEFORM'] = 1;
         }
         # Update the settings string
         {
@@ -840,10 +891,10 @@ function tripuse($key) {
             $flagvalue = str_pad(base_convert ($flagbin, 2, 32), 2, "0", STR_PAD_LEFT);
 
             if ($flgcolorchanged) {
-                $this->f['c'] = $flagvalue . substr($this->f['c'], 2);
+                @$this->f['c'] = $flagvalue . substr(@$this->f['c'], 2);
             }
             else {
-                $this->f['c'] = $flagvalue;
+                @$this->f['c'] = $flagvalue;
             }
         }
     }
@@ -905,12 +956,12 @@ class Bbs extends Webapp {
             ob_start("ob_gzhandler");
         }
 	# Prevent accidental posting when opening settings
-	if ($this->f['setup']) {
+	if (@$this->f['setup']) {
 	$this->prtcustom();
 	return;
 	}
         # Post operation
-        if ($this->f['m'] == 'p' and trim($this->f['v'])) {
+        if (@$this->f['m'] == 'p' and trim(@$this->f['v'])) {
             # Get environment variables
             $this->setuserenv();
             # Parameter check
@@ -925,10 +976,10 @@ class Bbs extends Webapp {
             }
             # Protect code redisplayed due to time lapse
             elseif ($posterr == 2) {
-                if ($this->f['f']) {
+                if (@$this->f['f']) {
                     $this->prtfollow(TRUE);
                 }
-                elseif ($this->f['write']) {
+                elseif (@$this->f['write']) {
                     $this->prtnewpost(TRUE);
                 }
                 else {
@@ -940,7 +991,7 @@ class Bbs extends Webapp {
                 $this->prterror(T('ADMIN_POST_DISABLED'));
             }
             # Post completion page
-            elseif ($this->f['f']) {
+            elseif (@$this->f['f']) {
                 $this->prtputcomplete();
             }
             else {
@@ -948,27 +999,27 @@ class Bbs extends Webapp {
             }
         }
         # Display follow-up page
-        elseif ($this->f['m'] == 'f') {
+        elseif (@$this->f['m'] == 'f') {
             $this->prtfollow();
         }
         # Post search
-        elseif ($this->f['m'] == 't' or $this->f['m'] == 's') {
+        elseif (@$this->f['m'] == 't' or @$this->f['m'] == 's') {
             $this->prtsearchlist();
         }
         # Display user settings page
-        elseif ($this->f['setup']) {
+        elseif (@$this->f['setup']) {
             $this->prtcustom();
         }
         # User settings process
-        elseif ($this->f['m'] == 'c') {
+        elseif (@$this->f['m'] == 'c') {
             $this->setcustom();
         }
         # New post
-        elseif ($this->f['m'] == 'p' and $this->f['write']) {
+        elseif (@$this->f['m'] == 'p' and @$this->f['write']) {
             $this->prtnewpost();
         }
         # UNDO process
-        elseif ($this->f['m'] == 'u') {
+        elseif (@$this->f['m'] == 'u') {
             $this->prtundo();
         }
         # Default: bulletin board display
@@ -995,9 +1046,9 @@ class Bbs extends Webapp {
         $dmsg = "";
         $dlink = "";
         if ($retry) {
-            $dtitle = $this->f['t'];
-            $dmsg = $this->f['v'];
-            $dlink = $this->f['l'];
+            $dtitle = @$this->f['t'];
+            $dmsg = @$this->f['v'];
+            $dlink = @$this->f['l'];
         }
         $this->setform ($dtitle, $dmsg, $dlink);
         # HTML header partial output
@@ -1060,7 +1111,7 @@ class Bbs extends Webapp {
         $items = @explode (',', $logdata[0], 3);
         $toppostid = $items[1];
         # Number of posts displayed
-        $msgdisp = Func::fixnumberstr($this->f['d']);
+        $msgdisp = Func::fixnumberstr(@$this->f['d']);
         if ($msgdisp === FALSE) {
             $msgdisp = $this->c['MSGDISP'];
         }
@@ -1070,29 +1121,29 @@ class Bbs extends Webapp {
         elseif ($msgdisp > $this->c['LOGSAVE']) {
             $msgdisp = $this->c['LOGSAVE'];
         }
-        if ($this->f['readzero']) {
+        if (@$this->f['readzero']) {
             $msgdisp = 0;
         }
         # Beginning of index
-        $bindex = $this->f['b'];
+        $bindex = @$this->f['b'];
         if (!$bindex) {
             $bindex = 0;
         }
         # For the next and subsequent pages
         if ($bindex > 1) {
             # If there are new posts, shift the beginning of the index
-            if ($toppostid > $this->f['p']) {
-                $bindex += ($toppostid - $this->f['p']);
+            if ($toppostid > @$this->f['p']) {
+                $bindex += ($toppostid - @$this->f['p']);
             }
             # Don't update unread pointer
-            $toppostid = $this->f['p'];
+            $toppostid = @$this->f['p'];
         }
         # End of index
         $eindex = $bindex + $msgdisp;
         # Unread reload
-        if ($this->f['readnew'] or ($msgdisp == '0' and $bindex == 0)) {
+        if (@$this->f['readnew'] or ($msgdisp == '0' and $bindex == 0)) {
             $bindex = 0;
-            $eindex = $toppostid - $this->f['p'];
+            $eindex = $toppostid - @$this->f['p'];
         }
         # For the last page, truncate
         $lastindex = count($logdata);
@@ -1110,7 +1161,7 @@ class Bbs extends Webapp {
         }
         else {
             $logdatadisp = array_splice ($logdata, $bindex, ($eindex - $bindex));
-            if ($this->c['RELTYPE'] and ($this->f['readnew'] or ($msgdisp == '0' and $bindex == 0))) {
+            if ($this->c['RELTYPE'] and (@$this->f['readnew'] or ($msgdisp == '0' and $bindex == 0))) {
                 $logdatadisp = array_reverse($logdatadisp);
             }
         }
@@ -1142,7 +1193,7 @@ class Bbs extends Webapp {
             'PCODE' => $pcode,
         ));
         # Hide post form
-        if ($this->c['HIDEFORM'] and $this->f['m'] != 'f' and !$this->f['write']) {
+        if ($this->c['HIDEFORM'] and @$this->f['m'] != 'f' and !@$this->f['write']) {
             $this->t->addVar('postform', 'mode', 'hide');
         }
         else {
@@ -1153,7 +1204,7 @@ class Bbs extends Webapp {
             ));
         }
         # Settings and links lines
-        if ($this->f['m'] != 'f' and !isset($this->f['f']) and !$this->f['write']) {
+        if (@$this->f['m'] != 'f' and !isset($this->f['f']) and !@$this->f['write']) {
             # Counter
             if ($this->c['SHOW_COUNTER']) {
                 $counter = $this->counter();
@@ -1212,20 +1263,20 @@ class Bbs extends Webapp {
      */
     function prtfollow($retry = FALSE) {
 
-        if (!$this->f['s']) {
+        if (!@$this->f['s']) {
             $this->prterror(T('NO_PARAMETERS'));
         }
 
         # Administrator authentication
         if ($this->c['BBSMODE_ADMINONLY'] == 1
-            and crypt($this->f['u'], $this->c['ADMINPOST']) != $this->c['ADMINPOST']) {
+            and crypt(@$this->f['u'], $this->c['ADMINPOST']) != $this->c['ADMINPOST']) {
             $this->prterror(T('INVALID_PASSWORD'));
         }
         $filename = '';
-        if ($this->f['ff']) {
-            $filename = trim($this->f['ff']);
+        if (@$this->f['ff']) {
+            $filename = trim(@$this->f['ff']);
         }
-        $result = $this->searchmessage('POSTID', $this->f['s'], FALSE, $filename);
+        $result = $this->searchmessage('POSTID', @$this->f['s'], FALSE, $filename);
         if (!$result) {
             $this->prterror(T('MESSAGE_NOT_FOUND'));
         }
@@ -1243,7 +1294,7 @@ class Bbs extends Webapp {
             $formmsg = preg_replace ("/\r>\s+\r/", "\r", $formmsg);
             $formmsg = preg_replace ("/\r>\s+\r$/", "\r", $formmsg);
         } else {
-            $formmsg = $this->f['v'];
+            $formmsg = @$this->f['v'];
             $formmsg = preg_replace ("/<a href=\"m=f\S+\"[^>]*>[^<]+<\/a>/i", "", $formmsg);
         }
         $formmsg .= "\r";
@@ -1258,8 +1309,8 @@ class Bbs extends Webapp {
 
         if ($this->c['AUTOLINK']) $this->t->addVar('follow', 'CHK_A', ' checked="checked"');
         $this->t->addVar('follow', 'FOLLOWID', $message['POSTID']);
-        $this->t->addVar('follow', 'SEARCHID', $this->f['s']);
-        $this->t->addVar('follow', 'FF', $this->f['ff']);
+        $this->t->addVar('follow', 'SEARCHID', @$this->f['s']);
+        $this->t->addVar('follow', 'FF', @$this->f['ff']);
         # Display
         $this->sethttpheader();
         print $this->prthtmlhead ($this->c['BBSTITLE'] . ' ' . T('FOLLOW_UP_POST'));
@@ -1277,7 +1328,7 @@ class Bbs extends Webapp {
 
         # Administrator authentication
         if ($this->c['BBSMODE_ADMINONLY'] != 0
-            and crypt($this->f['u'], $this->c['ADMINPOST']) != $this->c['ADMINPOST']) {
+            and crypt(@$this->f['u'], $this->c['ADMINPOST']) != $this->c['ADMINPOST']) {
             $this->prterror(T('INVALID_PASSWORD'));
         }
         # Form section
@@ -1285,9 +1336,9 @@ class Bbs extends Webapp {
         $dmsg = "";
         $dlink = "";
         if ($retry) {
-            $dtitle = $this->f['t'];
-            $dmsg = $this->f['v'];
-            $dlink = $this->f['l'];
+            $dtitle = @$this->f['t'];
+            $dmsg = @$this->f['v'];
+            $dlink = @$this->f['l'];
         }
         $this->setform ($dtitle, $dmsg, $dlink);
 
@@ -1307,11 +1358,11 @@ class Bbs extends Webapp {
      */
     function prtsearchlist($mode = "") {
 
-        if (!$this->f['s']) {
+        if (!@$this->f['s']) {
             $this->prterror(T('NO_PARAMETERS'));
         }
         if (!$mode) {
-            $mode = $this->f['m'];
+            $mode = @$this->f['m'];
         }
         $this->sethttpheader();
         print $this->prthtmlhead ($this->c['BBSTITLE'] . ' ' . T('POST_SEARCH'));
@@ -1319,7 +1370,7 @@ class Bbs extends Webapp {
 
         $result = $this->msgsearchlist($mode);
         foreach ($result as $message) {
-            print $this->prtmessage ($message, $mode, $this->f['ff']);
+            print $this->prtmessage ($message, $mode, @$this->f['ff']);
         }
         $success = count($result);
 
@@ -1335,12 +1386,12 @@ class Bbs extends Webapp {
     function msgsearchlist($mode) {
 
         $fh = NULL;
-        if ($this->f['ff']) {
-            if (preg_match("/^[\w.]+$/", $this->f['ff'])) {
-                $fh = @fopen($this->c['OLDLOGFILEDIR'] . $this->f['ff'], "rb");
+        if (@$this->f['ff']) {
+            if (preg_match("/^[\w.]+$/", @$this->f['ff'])) {
+                $fh = @fopen($this->c['OLDLOGFILEDIR'] . @$this->f['ff'], "rb");
             }
             if (!$fh) {
-                $this->prterror( sprintf(T('FAILED_TO_OPEN_LOG'), $this->f['ff']) );
+                $this->prterror( sprintf(T('FAILED_TO_OPEN_LOG'), @$this->f['ff']) );
             }
             flock ($fh, 1);
         }
@@ -1359,12 +1410,12 @@ class Bbs extends Webapp {
                 }
                 $message = $this->getmessage($logline);
                 # Search by user
-                if ($mode == 's' and preg_replace("/<[^>]*>/", '', $message['USER']) == $this->f['s']) {
+                if ($mode == 's' and preg_replace("/<[^>]*>/", '', $message['USER']) == @$this->f['s']) {
                     $result[] = $message;
                 }
                 # Search by thread
                 elseif ($mode == 't'
-                    and ($message['THREAD'] == $this->f['s'] or $message['POSTID'] == $this->f['s'])) {
+                    and ($message['THREAD'] == @$this->f['s'] or $message['POSTID'] == @$this->f['s'])) {
                     $result[] = $message;
                     if (!$threadstart) {
                         $threadstart = TRUE;
@@ -1379,14 +1430,14 @@ class Bbs extends Webapp {
             foreach ($logdata as $logline) {
                 $message = $this->getmessage($logline);
                 # Search by user
-                if ($mode == 's' and preg_replace("/<[^>]*>/", '', $message['USER']) == $this->f['s']) {
+                if ($mode == 's' and preg_replace("/<[^>]*>/", '', $message['USER']) == @$this->f['s']) {
                     $result[] = $message;
                 }
                 # Search by thread
                 elseif ($mode == 't'
-                    and ($message['THREAD'] == $this->f['s'] or $message['POSTID'] == $this->f['s'])) {
+                    and ($message['THREAD'] == @$this->f['s'] or $message['POSTID'] == @$this->f['s'])) {
                     $result[] = $message;
-                    if ($message['POSTID'] == $this->f['s']) {
+                    if ($message['POSTID'] == @$this->f['s']) {
                         break;
                     }
                 }
@@ -1442,8 +1493,8 @@ class Bbs extends Webapp {
         $redirecturl = $this->c['CGIURL'];
 
         # Cookie消去
-        if ($this->f['cr']) {
-            $this->f['c'] = '';
+        if (@$this->f['cr']) {
+            @$this->f['c'] = '';
             setcookie('c');
             setcookie('undo');
             $this->s['UNDO_P'] = '';
@@ -1464,9 +1515,9 @@ class Bbs extends Webapp {
             $flgchgindex = -1;
             $cindex = 0;
             foreach ($colors as $confname) {
-                if (strlen($this->f[$confname]) == 6 and preg_match("/^[0-9a-fA-F]{6}$/", $this->f[$confname])
-                    and $this->f[$confname] != $this->c[$confname]) {
-                    $this->c[$confname] = $this->f[$confname];
+                if (strlen(@$this->f[$confname] ?? '') == 6 and preg_match("/^[0-9a-fA-F]{6}$/", @$this->f[$confname] ?? '')
+                    and @$this->f[$confname] != $this->c[$confname]) {
+                    $this->c[$confname] = @$this->f[$confname];
                     $flgchgindex = $cindex;
                 }
                 $cindex++;
@@ -1478,16 +1529,16 @@ class Bbs extends Webapp {
             }
             $this->refcustom();
 
-            $this->f['c'] = substr($this->f['c'], 0, 2) . $cbase64str;
+            @$this->f['c'] = substr(@$this->f['c'], 0, 2) . $cbase64str;
 
-            $redirecturl .= "?c=".$this->f['c'];
+            $redirecturl .= "?c=".@$this->f['c'];
             foreach (array('w', 'd',) as $key) {
                 if ($this->f[$key] != '') {
                     $redirecturl .= "&{$key}=".$this->f[$key];
                 }
             }
-            if ($this->f['nm']) {
-                $redirecturl .= "&m=".$this->f['nm'];
+            if (@$this->f['nm']) {
+                $redirecturl .= "&m=".@$this->f['nm'];
             }
             if ($this->c['COOKIE']) {
                 $this->setbbscookie();
@@ -1506,27 +1557,40 @@ class Bbs extends Webapp {
      * UNDO process
      */
     function prtundo() {
-        if (!$this->f['s']) {
+        if (!@$this->f['s']) {
             $this->prterror(T('NO_PARAMETERS'));
         }
-        if (isset($this->s['UNDO_P']) and $this->s['UNDO_P'] == $this->f['s']) {
+        if (isset($this->s['UNDO_P']) and $this->s['UNDO_P'] == @$this->f['s']) {
             $loglines = $this->searchmessage('POSTID', $this->s['UNDO_P']);
             if (count($loglines) < 1) {
-                $this->prterror ( T('UNDO_POST_NOT_FOUND') );
+                #20260717 Gikoneko: the post is already gone (most commonly a
+                #double-submitted UNDO request racing with itself — the first
+                #request already deleted it before this one's search ran).
+                #The end state the user wants (post deleted) is already true,
+                #so treat this as success rather than showing an error.
+                #Note: this can't distinguish "already deleted" from "rotated
+                #into the old-log archive", so if LOGSAVE rotation is the
+                #actual cause here, the post itself is left untouched even
+                #though this reports success.
+                $this->s['UNDO_P'] = '';
+                $this->s['UNDO_K'] = '';
+                setcookie('undo');
             }
-            $message = $this->getmessage($loglines[0]);
-            $undokey = substr (preg_replace("/\W/", "", crypt($message['PROTECT'], $this->c['ADMINPOST'])), -8);
-            if ($undokey != $this->s['UNDO_K']) {
-                $this->prterror ( T('UNDO_NOT_PERMITTED') );
-            }
-            # Erase operation
-            require_once(PHP_BBSADMIN);
-            $bbsadmin = new Bbsadmin();
-            $bbsadmin->killmessage($this->s['UNDO_P']);
+            else {
+                $message = $this->getmessage($loglines[0]);
+                $undokey = substr (preg_replace("/\W/", "", crypt($message['PROTECT'], $this->c['ADMINPOST'])), -8);
+                if ($undokey != $this->s['UNDO_K']) {
+                    $this->prterror ( T('UNDO_NOT_PERMITTED') );
+                }
+                # Erase operation
+                require_once(PHP_BBSADMIN);
+                $bbsadmin = new Bbsadmin();
+                $bbsadmin->killmessage($this->s['UNDO_P']);
 
-            $this->s['UNDO_P'] = '';
-            $this->s['UNDO_K'] = '';
-            setcookie('undo');
+                $this->s['UNDO_P'] = '';
+                $this->s['UNDO_K'] = '';
+                setcookie('undo');
+            }
         }
         else {
             $this->prterror ( T('UNDO_NOT_PERMITTED') );
@@ -1583,41 +1647,41 @@ class Bbs extends Webapp {
             $this->prterror(T('SPAM_KUN'));
         }
 
-        if ($this->c['BBSMODE_ADMINONLY'] == 1 or ($this->c['BBSMODE_ADMINONLY'] == 2 and !$this->f['f'])) {
-            if (crypt($this->f['u'], $this->c['ADMINPOST']) != $this->c['ADMINPOST']) {
+        if ($this->c['BBSMODE_ADMINONLY'] == 1 or ($this->c['BBSMODE_ADMINONLY'] == 2 and !@$this->f['f'])) {
+            if (crypt(@$this->f['u'], $this->c['ADMINPOST']) != $this->c['ADMINPOST']) {
                 $this->prterror(T('ADMIN_ONLY_POSTING'));
             }
         }
-        if ($_SERVER['HTTP_REFERER'] and $this->c['REFCHECKURL']
-            and (strpos($_SERVER['HTTP_REFERER'], $this->c['REFCHECKURL']) === FALSE
-            or strpos($_SERVER['HTTP_REFERER'], $this->c['REFCHECKURL']) > 0)) {
+        if (@$_SERVER['HTTP_REFERER'] and $this->c['REFCHECKURL']
+            and (strpos(@$_SERVER['HTTP_REFERER'], $this->c['REFCHECKURL']) === FALSE
+            or strpos(@$_SERVER['HTTP_REFERER'], $this->c['REFCHECKURL']) > 0)) {
             $this->prterror(T('BAD_REFERER') . "<br>{$this->c['REFCHECKURL']}.");
         }
-        foreach (explode ("\r", $this->f['v']) as $line) {
+        foreach (explode ("\r", @$this->f['v']) as $line) {
             if (strlen ($line) > $this->c['MAXMSGCOL']) {
                 $this->prterror(T('POST_TOO_WIDE'));
             }
         }
-        if (substr_count ($this->f['v'], "\r") > $this->c['MAXMSGLINE'] - 1) {
+        if (substr_count (@$this->f['v'], "\r") > $this->c['MAXMSGLINE'] - 1) {
             $this->prterror(T('POST_TOO_MANY_LINES'));
         }
-        if (strlen ($this->f['v']) > $this->c['MAXMSGSIZE']) {
+        if (strlen (@$this->f['v']) > $this->c['MAXMSGSIZE']) {
             $this->prterror(T('POST_TOO_LARGE'));
         }
-        if (strlen ($this->f['u']) > $this->c['MAXNAMELENGTH']) {
+        if (strlen (@$this->f['u']) > $this->c['MAXNAMELENGTH']) {
             $this->prterror(T('NAME_TOO_LONG'));
         }
-        if (strlen ($this->f['i']) > $this->c['MAXMAILLENGTH']) {
+        if (strlen (@$this->f['i']) > $this->c['MAXMAILLENGTH']) {
             $this->prterror(T('EMAIL_TOO_LONG'));
         }
-//        if ($this->f['i']) { ## mod
+//        if (@$this->f['i']) { ## mod
 //            $this->prterror(T('SPAM_KUN')); ## mod
 //        } ## mod
-        if (strlen ($this->f['t']) > $this->c['MAXTITLELENGTH']) {
+        if (strlen (@$this->f['t']) > $this->c['MAXTITLELENGTH']) {
             $this->prterror(T('TITLE_TOO_LONG'));
         }
         {
-            $timestamp = Func::pcode_verify ($this->f['pc'], $limithost);
+            $timestamp = Func::pcode_verify (@$this->f['pc'], $limithost);
 
             if ((CURRENT_TIME - $timestamp ) < $this->c['MINPOSTSEC'] ) {
                 $this->prterror(T('POST_TOO_FAST'));
@@ -1629,18 +1693,18 @@ class Bbs extends Webapp {
             } */
         }
 
-        if (trim($this->f['v']) == '') {
+        if (trim(@$this->f['v']) == '') {
             $posterr = 2;
             return $posterr;
         }
 
         ## if ($this->c['NGWORD']) {
         ##     foreach ($this->c['NGWORD'] as $ngword) {
-        ##         if (strpos($this->f['v'], $ngword) !== FALSE
-        ##             or strpos($this->f['l'], $ngword) !== FALSE
-        ##             or strpos($this->f['t'], $ngword) !== FALSE
-        ##             or strpos($this->f['u'], $ngword) !== FALSE
-        ##             or strpos($this->f['i'], $ngword) !== FALSE) {
+        ##         if (strpos(@$this->f['v'], $ngword) !== FALSE
+        ##             or strpos(@$this->f['l'], $ngword) !== FALSE
+        ##             or strpos(@$this->f['t'], $ngword) !== FALSE
+        ##             or strpos(@$this->f['u'], $ngword) !== FALSE
+        ##             or strpos(@$this->f['i'], $ngword) !== FALSE) {
         ##            $this->prterror( T('NGWORD_FOUND') );
         ##         }
         ##     }
@@ -1649,11 +1713,11 @@ class Bbs extends Webapp {
             foreach ($this->c['NGWORD'] as $ngword) {
                 $ngword = strtolower($ngword); // Convert prohibited word to lowercase
                 if (
-                    strpos(strtolower($this->f['v']), $ngword) !== FALSE ||
-                    strpos(strtolower($this->f['l']), $ngword) !== FALSE ||
-                    strpos(strtolower($this->f['t']), $ngword) !== FALSE ||
-                    strpos(strtolower($this->f['u']), $ngword) !== FALSE ||
-                    strpos(strtolower($this->f['i']), $ngword) !== FALSE
+                    strpos(strtolower(@$this->f['v']), $ngword) !== FALSE ||
+                    strpos(strtolower(@$this->f['l']), $ngword) !== FALSE ||
+                    strpos(strtolower(@$this->f['t']), $ngword) !== FALSE ||
+                    strpos(strtolower(@$this->f['u']), $ngword) !== FALSE ||
+                    strpos(strtolower(@$this->f['i']), $ngword) !== FALSE
                 ) {
                     $this->prterror( T('NGWORD_FOUND') );
                 }
@@ -1661,11 +1725,11 @@ class Bbs extends Webapp {
         } ## mod end
 
         #20240204 猫 spam detection (https://php.o0o0.jp/article/php-spam)
-        # Number of characters: char_num = mb_strlen( $this->f['v'], 'UTF8');
-        # Number of bytes: byte_num = strlen( $this->f['v']);
+        # Number of characters: char_num = mb_strlen( @$this->f['v'], 'UTF8');
+        # Number of bytes: byte_num = strlen( @$this->f['v']);
 
-        ## $char_num = mb_strlen( $this->f['v'], 'UTF8');
-        ## $byte_num = strlen( $this->f['v']);
+        ## $char_num = mb_strlen( @$this->f['v'], 'UTF8');
+        ## $byte_num = strlen( @$this->f['v']);
 
         # When single-byte characters makes up more than 90% of the total
         ## if ((($char_num * 3 - $byte_num) / 2 / $char_num * 100) > 90) {
@@ -1902,17 +1966,17 @@ function protectAdminName($name,$trip,$copy)
     function getformmessage() {
 
         $message = array();
-        $message['PCODE'] = $this->f['pc'];
-        $message['USER'] = $this->f['u'];
-        $message['MAIL'] = $this->f['i'];
-        $message['TITLE'] = $this->f['t'];
-        $message['MSG'] = $this->f['v'];
-        $message['URL'] = $this->f['l'];
+        $message['PCODE'] = @$this->f['pc'];
+        $message['USER'] = @$this->f['u'];
+        $message['MAIL'] = @$this->f['i'];
+        $message['TITLE'] = @$this->f['t'];
+        $message['MSG'] = @$this->f['v'];
+        $message['URL'] = @$this->f['l'];
         $message['PHOST'] = $this->s['HOST'];
         $message['AGENT'] = $this->s['AGENT'];
         # Reference ID
-        if ($this->f['f']) {
-            $message['REFID'] = $this->f['f'];
+        if (@$this->f['f']) {
+            $message['REFID'] = @$this->f['f'];
         }
         else {
             $message['REFID'] = '';
@@ -1948,7 +2012,7 @@ if ($result === 3) {
         }
         # Reference
         if ($message['REFID']) {
-            $refdata = $this->searchmessage('POSTID', $message['REFID'], FALSE, $this->f['ff']);
+            $refdata = $this->searchmessage('POSTID', $message['REFID'], FALSE, @$this->f['ff']);
             if (!$refdata) {
                 $this->prterror ( T('REFERENCE_NOT_FOUND') );
             }
@@ -1978,6 +2042,10 @@ if ($result === 3) {
         if (!is_array($message)) {
             return $message;
         }
+        #20260717 Gikoneko: auto-create the main log file on first post
+        if (!file_exists($this->c['LOGFILENAME']) and $this->ensurefile($this->c['LOGFILENAME'])) {
+            $this->prtfilecreated(array(sprintf(T('FILE_AUTOCREATED'), $this->c['LOGFILENAME'])));
+        }
         $fh = @fopen($this->c['LOGFILENAME'], "rb+");
         if (!$fh) {
             $this->prterror ( T('FAILED_TO_READ_MESSAGE') );
@@ -1990,8 +2058,8 @@ if ($result === 3) {
                 $logdata[] = $logline;
         }
         $posterr = 0;
-        if ($this->f['ff']) {
-            $refdata = $this->searchmessage('THREAD', $message['REFID'], FALSE, $this->f['ff']);
+        if (@$this->f['ff']) {
+            $refdata = $this->searchmessage('THREAD', $message['REFID'], FALSE, @$this->f['ff']);
             if (isset($refdata[0])) {
                 $refmessage = $this->getmessage($refdata[0]);
                 if ($refmessage) {
@@ -2228,7 +2296,7 @@ if ($result === 3) {
     function setuserenv() {
 
         if ($this->c['UAREC']) {
-            $agent = $_SERVER['HTTP_USER_AGENT'];
+            $agent = @$_SERVER['HTTP_USER_AGENT'];
             $agent = Func::html_escape($agent);
             $this->s['AGENT'] = $agent;
         }
@@ -2248,9 +2316,9 @@ if ($result === 3) {
      * Bulletin board cookie registration
      */
     function setbbscookie() {
-        $cookiestr = "u=" . urlencode($this->f['u']);
-        $cookiestr .= "&i=" . urlencode($this->f['i']);
-        $cookiestr .= "&c=" . $this->f['c'];
+        $cookiestr = "u=" . urlencode(@$this->f['u']);
+        $cookiestr .= "&i=" . urlencode(@$this->f['i']);
+        $cookiestr .= "&c=" . @$this->f['c'];
         setcookie('c', $cookiestr, CURRENT_TIME + 7776000); // expires in 90 days
     }
 
@@ -2282,6 +2350,7 @@ if ($result === 3) {
             }
         }
         $count = array();
+        $filenumber = array();
         for ($i = 0; $i < $countlevel; $i++) {
             $filename = "{$this->c['COUNTFILE']}{$i}.dat";
             if (is_writable ($filename) and $fh = @fopen ($filename, "r")) {
@@ -2319,8 +2388,8 @@ if ($result === 3) {
         if ($cntfilename) {
             $mbrcount = 0;
             $remoteaddr = '0.0.0.0';
-            if ($_SERVER['REMOTE_ADDR']) {
-                $remoteaddr = $_SERVER['REMOTE_ADDR'];
+            if (@$_SERVER['REMOTE_ADDR']) {
+                $remoteaddr = @$_SERVER['REMOTE_ADDR'];
             }
             $ukey = hexdec(substr(md5($remoteaddr), 0, 8));
             $newcntdata = array();
@@ -2389,26 +2458,26 @@ class Func {
 
     public static function getuserenv() {
 
-        $addr = $_SERVER['REMOTE_ADDR'];
-        $host = $_SERVER['REMOTE_HOST'];
-        $agent = $_SERVER['HTTP_USER_AGENT'];
+        $addr = @$_SERVER['REMOTE_ADDR'];
+        $host = @$_SERVER['REMOTE_HOST'];
+        $agent = @$_SERVER['HTTP_USER_AGENT'];
         if ($addr == $host or !$host) {
             $host = gethostbyaddr ($addr);
         }
 
         $proxyflg = 0;
 
-        if ($_SERVER['HTTP_CACHE_CONTROL']) { $proxyflg = 1; }
-        if ($_SERVER['HTTP_CACHE_INFO']) { $proxyflg += 2; }
-        if ($_SERVER['HTTP_CLIENT_IP']) { $proxyflg += 4; }
-        if ($_SERVER['HTTP_FORWARDED']) { $proxyflg += 8; }
-        if ($_SERVER['HTTP_FROM']) { $proxyflg += 16; }
-        if ($_SERVER['HTTP_PROXY_AUTHORIZATION']) { $proxyflg += 32; }
-        if ($_SERVER['HTTP_PROXY_CONNECTION']) { $proxyflg += 64; }
-        if ($_SERVER['HTTP_SP_HOST']) { $proxyflg += 128; }
-        if ($_SERVER['HTTP_VIA']) { $proxyflg += 256; }
-        if ($_SERVER['HTTP_X_FORWARDED_FOR']) { $proxyflg += 512; }
-        if ($_SERVER['HTTP_X_LOCKING']) { $proxyflg += 1024; }
+        if (@$_SERVER['HTTP_CACHE_CONTROL']) { $proxyflg = 1; }
+        if (@$_SERVER['HTTP_CACHE_INFO']) { $proxyflg += 2; }
+        if (@$_SERVER['HTTP_CLIENT_IP']) { $proxyflg += 4; }
+        if (@$_SERVER['HTTP_FORWARDED']) { $proxyflg += 8; }
+        if (@$_SERVER['HTTP_FROM']) { $proxyflg += 16; }
+        if (@$_SERVER['HTTP_PROXY_AUTHORIZATION']) { $proxyflg += 32; }
+        if (@$_SERVER['HTTP_PROXY_CONNECTION']) { $proxyflg += 64; }
+        if (@$_SERVER['HTTP_SP_HOST']) { $proxyflg += 128; }
+        if (@$_SERVER['HTTP_VIA']) { $proxyflg += 256; }
+        if (@$_SERVER['HTTP_X_FORWARDED_FOR']) { $proxyflg += 512; }
+        if (@$_SERVER['HTTP_X_LOCKING']) { $proxyflg += 1024; }
         if (preg_match ("/cache|delegate|gateway|httpd|proxy|squid|www|via/i", $agent)) {
             $proxyflg += 2048;
         }
@@ -2422,25 +2491,25 @@ class Func {
         $realhost = '';
         if ( $proxyflg > 0 ) {
             $matches = array();
-            if (preg_match ("/^(\d+)\.(\d+)\.(\d+)\.(\d+)/", $_SERVER['HTTP_X_FORWARDED_FOR'], $matches)) {
+            if (preg_match ("/^(\d+)\.(\d+)\.(\d+)\.(\d+)/", @$_SERVER['HTTP_X_FORWARDED_FOR'], $matches)) {
                 $realaddr = "{$matches[1]}.{$matches[2]}.{$matches[3]}.{$matches[4]}";
             }
-            elseif (preg_match ("/(\d+)\.(\d+)\.(\d+)\.(\d+)/", $_SERVER['HTTP_FORWARDED'], $matches)) {
+            elseif (preg_match ("/(\d+)\.(\d+)\.(\d+)\.(\d+)/", @$_SERVER['HTTP_FORWARDED'], $matches)) {
                 $realaddr = "{$matches[1]}.{$matches[2]}.{$matches[3]}.{$matches[4]}";
             }
-            elseif (preg_match ("/(\d+)\.(\d+)\.(\d+)\.(\d+)/", $_SERVER['HTTP_VIA'], $matches)) {
+            elseif (preg_match ("/(\d+)\.(\d+)\.(\d+)\.(\d+)/", @$_SERVER['HTTP_VIA'], $matches)) {
                 $realaddr = "{$matches[1]}.{$matches[2]}.{$matches[3]}.{$matches[4]}";
             }
-            elseif (preg_match ("/(\d+)\.(\d+)\.(\d+)\.(\d+)/", $_SERVER['HTTP_CLIENT_IP'], $matches)) {
+            elseif (preg_match ("/(\d+)\.(\d+)\.(\d+)\.(\d+)/", @$_SERVER['HTTP_CLIENT_IP'], $matches)) {
                 $realaddr = "{$matches[1]}.{$matches[2]}.{$matches[3]}.{$matches[4]}";
             }
-            elseif (preg_match ("/(\d+)\.(\d+)\.(\d+)\.(\d+)/", $_SERVER['HTTP_SP_HOST'], $matches)) {
+            elseif (preg_match ("/(\d+)\.(\d+)\.(\d+)\.(\d+)/", @$_SERVER['HTTP_SP_HOST'], $matches)) {
                 $realaddr = "{$matches[1]}.{$matches[2]}.{$matches[3]}.{$matches[4]}";
             }
-            elseif (preg_match ("/.*\sfor\s(.+)/", $_SERVER['HTTP_FORWARDED'], $matches)) {
+            elseif (preg_match ("/.*\sfor\s(.+)/", @$_SERVER['HTTP_FORWARDED'], $matches)) {
                 $realhost = $matches[1];
             }
-            elseif (preg_match ("/\-\@(.+)/", $_SERVER['HTTP_FROM'], $matches)) {
+            elseif (preg_match ("/\-\@(.+)/", @$_SERVER['HTTP_FROM'], $matches)) {
                 $realhost = $matches[1];
             }
             if (!$realaddr and $realhost) {
@@ -2465,8 +2534,8 @@ class Func {
         $ukey = 0;
         if ($limithost) {
             $remoteaddr = '0.0.0.0';
-            if ($_SERVER['REMOTE_ADDR']) {
-                $remoteaddr = $_SERVER['REMOTE_ADDR'];
+            if (@$_SERVER['REMOTE_ADDR']) {
+                $remoteaddr = @$_SERVER['REMOTE_ADDR'];
             }
             $ukey = hexdec(substr(md5($remoteaddr), 0, 8));
         }
@@ -2497,8 +2566,8 @@ class Func {
         $ukey = 0;
         if ($limithost) {
             $remoteaddr = '0.0.0.0';
-            if ($_SERVER['REMOTE_ADDR']) {
-                $remoteaddr = $_SERVER['REMOTE_ADDR'];
+            if (@$_SERVER['REMOTE_ADDR']) {
+                $remoteaddr = @$_SERVER['REMOTE_ADDR'];
             }
             $ukey = hexdec(substr(md5($remoteaddr), 0, 8));
         }
@@ -2650,6 +2719,7 @@ class Func {
             return $value;
         }
         while (preg_match("/(<a href=[^>]+>)<img ([^>]+)>(<\/a>)/i", $value, $matches)) {
+            $altvalue = '';
             if (preg_match("/alt=\"([^\"]+)\"/", $matches[2], $submatches)) {
                 $altvalue = $submatches[1];
             }
@@ -2782,7 +2852,7 @@ class Func {
         }
         $hit = FALSE;
         list ($addr, $host, $proxyflg, $realaddr, $realhost) = Func::getuserenv();
-        $agent = $_SERVER['HTTP_USER_AGENT'];
+        $agent = @$_SERVER['HTTP_USER_AGENT'];
         foreach ($hostlist as $hostpattern) {
             foreach ($hostagent as $hostagentpattern) {
                 if ((preg_match("/$hostpattern/", $host) or preg_match("/$hostpattern/", $realhost)) or preg_match("/$hostagentpattern/", $agent)) {
