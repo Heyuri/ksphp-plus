@@ -82,7 +82,7 @@ class Bbsadmin extends Webapp {
         # Message deletion process
         else if (@$this->f['ad'] == 'x') {
             if (isset($this->f['x'])) {
-                $this->killmessage($this->f['x']);
+                $this->killmessage(@$this->f['x']);
                 // Redirect to the message deletion list to prevent resubmission
                 header('Location: ' . $this->c['CGIURL'] . '?m=ad&ad=k');
                 exit();
@@ -121,7 +121,7 @@ class Bbsadmin extends Webapp {
      */
     function prtadminmenu() {
 
-        $this->t->addVar('adminmenu', 'V', trim($this->f['v'] ?? ''));
+        $this->t->addVar('adminmenu', 'V', trim(@$this->f['v'] ?? ''));
 
         $this->sethttpheader();
         print $this->prthtmlhead ($this->c['BBSTITLE'] . ' Administration menu');
@@ -140,12 +140,16 @@ class Bbsadmin extends Webapp {
      */
     function prtkilllist() {
 
+        #20260717 Gikoneko: auto-create the main log file on first run
+        if (!file_exists($this->c['LOGFILENAME']) and $this->ensurefile($this->c['LOGFILENAME'])) {
+            $this->prtfilecreated(array("{$this->c['LOGFILENAME']} was not found, so it has been newly created."));
+        }
         if (!file_exists($this->c['LOGFILENAME'])) {
             $this->prterror('Failed to load message');
         }
         $logdata = file($this->c['LOGFILENAME']);
 
-        $this->t->addVar('killlist', 'V', trim($this->f['v'] ?? ''));
+        $this->t->addVar('killlist', 'V', trim(@$this->f['v'] ?? ''));
 
         $messages = array();
         foreach ($logdata as $logline) {
@@ -207,6 +211,10 @@ class Bbsadmin extends Webapp {
             $killids[] = $tmp;
         }
 
+        #20260717 Gikoneko: auto-create the main log file on first run
+        if (!file_exists($this->c['LOGFILENAME']) and $this->ensurefile($this->c['LOGFILENAME'])) {
+            $this->prtfilecreated(array("{$this->c['LOGFILENAME']} was not found, so it has been newly created."));
+        }
         $fh = @fopen($this->c['LOGFILENAME'], "r+");
         if (!$fh) {
             $this->prterror ( 'Failed to load message' );
@@ -333,7 +341,7 @@ class Bbsadmin extends Webapp {
      */
     function prtsetpass() {
 
-        $this->t->addVar('setpass', 'V', trim($this->f['v'] ?? ''));
+        $this->t->addVar('setpass', 'V', trim(@$this->f['v'] ?? ''));
 
         $this->sethttpheader();
         print $this->prthtmlhead ($this->c['BBSTITLE'] . ' Password settings page');

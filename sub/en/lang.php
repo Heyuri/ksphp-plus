@@ -8,6 +8,7 @@ $MSG = array(
 
     /* Generic / IO errors */
     'FAILED_TO_READ_MESSAGE'  => 'Failed to read message',
+    'FILE_AUTOCREATED'        => '%s was not found, so it has been newly created.',
     'FAILED_TO_OPEN_LOG' => 'Failed to open log file: %s',
     'FAILED_TO_OUTPUT_LOG'    => 'Failed to output message log',
     'OLDLOG_TOO_LARGE'        => 'Message log file exceeds the file size limit',
