@@ -243,7 +243,10 @@ class Treeview extends Bbs {
             }
 
             # Extract reference IDs from "reference"
-            foreach ($thread as $message) {
+            #20260716 Gikoneko: foreach was by-value, so the recovered REFID never
+            #propagated back into $thread, causing legacy posts without a stored
+            #REFID field to be dropped from the tree view. Changed to by-reference.
+            foreach ($thread as &$message) {
                 if (!@$message['REFID']) {
                     if (preg_match("/<a href=\"m=f&s=(\d+)[^>]+>([^<]+)<\/a>$/i", $message['MSG'], $matches)) {
                         $message['REFID'] = $matches[1];
@@ -253,6 +256,7 @@ class Treeview extends Bbs {
                     }
                 }
             }
+            unset($message);
 
             # Output $thread text tree
             $this->prttexttree($msgcurrent, $thread);
@@ -378,7 +382,7 @@ class Treeview extends Bbs {
                 $treemsg['MSG'] = rtrim($treemsg['MSG']);
 
                 #20181117 Gikoneko: Personal word filter
-                $treemsg['MSG']  = preg_replace("/(.+)/","<div class= \"ngline\">$1</div>\r", $treemsg['MSG']);
+                $treemsg['MSG']  = preg_replace("/(.+)/","<span class= \"ngline\">$1</span>\r", $treemsg['MSG']);
 
                 # Link to the follow-up post page
                 $treeprint .= "<a href=\"{$this->s['DEFURL']}&amp;m=f&amp;s={$parentid}\" target=\"link\">{$this->c['TXTFOLLOW']}</a>";
