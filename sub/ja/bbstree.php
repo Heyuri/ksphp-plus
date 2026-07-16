@@ -193,44 +193,21 @@ class Treeview extends Bbs {
 
         $threadindex = 0;
 
+        #20260716 スレッド毎にログ全体を再走査・再解析していた処理を、
+        #1パスでの索引化に置き換え
+        list($order, $buckets, $newest) = $this->indexthreads($logdata);
+
         # 最終書き込み時刻が最新のスレッド順に処理
-        while (count($logdata) > 0) {
-
-            $msgcurrent = $this->getmessage(array_shift($logdata));
-            if (!$msgcurrent['THREAD']) {
-                $msgcurrent['THREAD'] = $msgcurrent['POSTID'];
-            }
-
-            # スレッドを$logdataから抽出し、スレッドのメッセージ配列 $thread を作成
-            $thread = array($msgcurrent);
-            $i = 0;
-            while ($i < count($logdata)) {
-                $message = $this->getmessage($logdata[$i]);
-                if ($message['THREAD'] == $msgcurrent['THREAD']
-                    or $message['POSTID'] == $msgcurrent['THREAD']) {
-                    array_splice($logdata, $i, 1);
-                    $thread[] = $message;
-                    # 根の発見
-                    if ($message['POSTID'] == $message['THREAD'] or !$message['THREAD']) {
-                        break;
-                    }
-                }
-                else {
-                    $i++;
-                }
-            }
+        foreach ($order as $tid) {
 
             # 未読リロード
+            #20260716 スレッドは最終更新の新しい順に処理されるため、
+            #未読を含まないスレッドが現れた時点で以降も全て既読 → break。
+            #$newest[$tid]はそのスレッドの最大POSTIDなので、旧コードの
+            #メッセージ毎のループと同じ判定を、解析なしで行える。
             if ($isreadnew) {
-                $hit = FALSE;
-                for ($i = 0; $i < count($thread); $i++) {
-                    if ($thread[$i]['POSTID'] > $this->f['p']) {
-                        $hit = TRUE;
-                        break;
-                    }
-                }
-                if (!$hit) {
-                    continue;
+                if (!($newest[$tid] > $this->f['p'])) {
+                    break;
                 }
             }
             else if ($this->s['MSGDISP'] < 0) {
@@ -241,6 +218,16 @@ class Treeview extends Bbs {
                 $threadindex++;
                 continue;
             }
+
+            # 実際に表示するスレッドのみ完全に解析する
+            $thread = array();
+            foreach ($buckets[$tid] as $logline) {
+                $thread[] = $this->getmessage($logline);
+            }
+            if (!$thread[0]['THREAD']) {
+                $thread[0]['THREAD'] = $thread[0]['POSTID'];
+            }
+            $msgcurrent = $thread[0];
 
             #「参考」からの参照ID抽出
             #20260716 擬古猫 foreachが値渡しのため$threadへ反映されず、
@@ -279,7 +266,10 @@ class Treeview extends Bbs {
         else {
             $msgmore = '未読メッセージはありません。';
         }
-        if (count($logdata) == 0) {
+        #20260716 旧コードのcount($logdata)==0は、ループがログ配列を
+        #破壊的に消費していたから成立していた判定。スレッド進捗と
+        #スレッド総数の比較に変更。
+        if ($threadindex >= count($order)) {
             $msgmore .= 'これ以下のスレッドはありません。';
         }
         $this->t->addVar('treeview_lower', 'MSGMORE', $msgmore);
@@ -310,6 +300,59 @@ class Treeview extends Bbs {
     }
 
 
+
+
+
+    /**
+     * ログ全体を1パスでスレッド別に索引化する。
+     *
+     * ここではCSVの先頭4フィールド（NDATE,POSTID,PROTECT,THREAD）しか読まない。
+     * これらは常に数値であり、書き込み時点でFunc::html_escape()が投稿本文中の
+     * カンマをすべて「&#44;」へ変換しているため、単純なexplode()が本文に影響
+     * されることはない。getmessage()は実際に表示するスレッドにのみ実行される。
+     *
+     * 返信は常に親のTHREADフィールドを引き継ぐ（putmessage参照）。親がTHREAD
+     * フィールドを持たない旧仕様の根の場合は親のPOSTIDを引き継ぐ。したがって
+     * 「THREAD、空ならPOSTID」で全ての行のスレッドを識別でき、これは旧走査が
+     * 毎回探し直していた情報そのものである。
+     *
+     * @param   Array   $logdata  ログ行配列（新しい順）
+     * @return  Array   $order    スレッドID（最終更新の新しい順）
+     * @return  Array   $buckets  スレッドID => ログ行（新しい順）
+     * @return  Array   $newest   スレッドID => そのスレッドの最大POSTID
+     */
+    function indexthreads(&$logdata) {
+
+        $order   = array();
+        $buckets = array();
+        $newest  = array();
+
+        foreach ($logdata as $logline) {
+
+            # getmessage()と同じ判定：正常な行は最低10フィールド持つ。
+            if (substr_count($logline, ',') < 9) {
+                continue;
+            }
+
+            $items  = explode(',', $logline, 5);
+            $postid = $items[1];
+            $tid    = $items[3];
+            if (!$tid) {
+                $tid = $postid;
+            }
+
+            if (!isset($buckets[$tid])) {
+                $buckets[$tid] = array();
+                $order[]       = $tid;
+                # ログは厳密に新しい順なので、あるスレッドで最初に現れる行が
+                # そのスレッドの最大POSTIDを持つ。
+                $newest[$tid]  = $postid;
+            }
+            $buckets[$tid][] = $logline;
+        }
+
+        return array($order, $buckets, $newest);
+    }
 
 
 
