@@ -82,14 +82,14 @@ class Getlog extends Webapp {
         }
         # ダウンロード
         else if (@$this->f['dl']) {
-            $result = $this->prthtmldownload($this->f['dl']);
+            $result = $this->prthtmldownload(@$this->f['dl']);
             if ($result) {
                 $this->prtloglist();
             }
         }
         # トピック一覧
         else if (@$this->f['l']) {
-            $result = $this->prttopiclist($this->f['l']);
+            $result = $this->prttopiclist(@$this->f['l']);
             if ($result) {
                 $this->prtloglist();
             }
@@ -145,6 +145,8 @@ class Getlog extends Webapp {
 
         # 更新時間が最新のファイルを標準でチェック
         $maxftime = 0;
+        #20260717 Gikoneko: defensive init so PHPStan/PHP8 don't warn if $files is empty
+        $checkedfile = '';
         foreach ($files as $filename) {
             $fstat = stat ($dir . $filename);
             if ($fstat[9] > $maxftime) {
@@ -277,11 +279,11 @@ class Getlog extends Webapp {
     function prtsearchresult() {
 
         $formf = array();
-        if (is_array($this->f['f'])) {
-            $formf = $this->f['f'];
+        if (is_array(@$this->f['f'])) {
+            $formf = @$this->f['f'];
         }
         else {
-            $formf[] = $this->f['f'];
+            $formf[] = @$this->f['f'];
         }
         if (!@$this->c['MULTIPLESEARCH'] and count($formf) > 1) {
             array_splice($formf, 1);

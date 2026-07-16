@@ -158,6 +158,10 @@ class Imagebbs extends Bbs {
             }
 
             # 画像アップロードプロセスのロック
+            #20260717 Gikoneko: auto-create the upload-id file on first run
+            if (!file_exists($this->c['UPLOADIDFILE']) and $this->ensurefile($this->c['UPLOADIDFILE'], '0')) {
+                $this->prtfilecreated(array("{$this->c['UPLOADIDFILE']}が見つからなかったため、新規に作成しました。"));
+            }
             $fh = @fopen($this->c['UPLOADIDFILE'], "rb+");
             if (!$fh) {
                 $this->prterror ( 'アップロード記録ファイルの読み込みに失敗しました' );
