@@ -48,7 +48,7 @@ $CONF = array(
   // * Bulletin board name
   ## TL note: Ayashii World titles usually take the form of "AyashiiWorld@[web host name]
   ## TL note: StrangeWorld@ is the common English way to start it
-  'BBSTITLE' => 'あやしいわーるど＠PHP+',
+  'BBSTITLE' => 'あやしいわーるど＠',
 
   // * 広報室のURL
   // * URL for the Public Relations Office (home/information page)
