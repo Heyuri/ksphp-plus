@@ -1,0 +1,35 @@
+<patTemplate:tmpl name="page">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html>
+<head>
+	<title>patTemplate - Beispiel 1</title>
+
+<style type="text/css">
+TD		{font-family: Verdana, Arial, sans-serif; font-size: 12px }
+</style>
+</head>
+
+<body>
+<table>
+<patTemplate:tmpl name="suchergebnis" type="Condition" conditionvar="ERGEBNISSE">
+	<patTemplate:sub condition="0">
+	<tr>
+		<td><font color="#ff0000">Es wurden keine Ergebnisse gefunden.</font></td>
+	</tr>
+	</patTemplate:sub>
+	<patTemplate:sub condition="1">
+	<tr>
+		<td><font color="#000000">Zu Ihrer Suche wurde folgende Seite gefunden.</font></td>
+	</tr>
+	</patTemplate:sub>
+	<patTemplate:sub condition="default">
+	<tr>
+		<td><font color="#000000">Zu Ihrer Suche wurden {ERGEBNISSE} Seite gefunden.</font></td>
+	</tr>
+	</patTemplate:sub>
+</patTemplate:tmpl>
+</table>
+</body>
+</html>
+</patTemplate:tmpl>

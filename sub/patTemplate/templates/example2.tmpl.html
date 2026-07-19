@@ -1,0 +1,36 @@
+<patTemplate:tmpl name="page">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html>
+<head>
+	<title>patTemplate - Beispiel 1</title>
+
+<style type="text/css">
+TD		{font-family: Verdana, Arial, sans-serif; font-size: 12px }
+</style>
+</head>
+
+<body>
+
+<patTemplate:tmpl name="liste">
+<table border="1" cellpadding="0" cellspacing="2">
+<patTemplate:tmpl name="listeneintrag" type="OddEven">
+	<patTemplate:sub condition="odd">
+	<tr>
+		<td>{CUSTOMER_NAME}</td>
+		<td>{CUSTOMER_EMAIL}</td>
+	</tr>
+	</patTemplate:sub>
+	<patTemplate:sub condition="even">
+	<tr bgcolor="#EEEEEE">
+		<td>{CUSTOMER_NAME}</td>
+		<td>{CUSTOMER_EMAIL}</td>
+	</tr>
+	</patTemplate:sub>
+</patTemplate:tmpl>
+</table>
+</patTemplate:tmpl>
+
+</body>
+</html>
+</patTemplate:tmpl>

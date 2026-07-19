@@ -1,0 +1,22 @@
+<patTemplate:tmpl name="latex">
+% why not generate some latex-documents 
+%
+
+\documentclass{article}
+\title{ patTemplate \& LaTeX \\ Just a demo }
+\author{ \sc {Stephan Schmidt}}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\section{ The first section }
+The following section will be created with templates.
+
+<patTemplate:tmpl name="section">
+\section{<{SECTION_TITLE}>} \label{<{SECTION_LABEL}>}
+<{SECTION_BODY}>
+</patTemplate:tmpl>
+
+\end{document}
+</patTemplate:tmpl>

@@ -1,0 +1,37 @@
+<patTemplate:tmpl name="page">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html>
+<head>
+	<title>patTemplate - Beispiel 1</title>
+
+<style type="text/css">
+TD		{font-family: Verdana, Arial, sans-serif; font-size: 12px }
+</style>
+</head>
+
+<body>
+<table width="90%">
+	<tr>
+		<td>Inhalt 1</td>
+	</tr>
+<patTemplate:tmpl name="balken">
+	<tr>
+		<td><hr width="100%"></td>
+	</tr>
+</patTemplate:tmpl>
+	<tr>
+		<td>Inhalt 2</td>
+	</tr>
+<patTemplate:link src="balken"/>
+	<tr>
+		<td>Inhalt 3</td>
+	</tr>
+<patTemplate:link src="balken"/>
+	<tr>
+		<td>Inhalt 4</td>
+	</tr>
+</table>
+</body>
+</html>
+</patTemplate:tmpl>
