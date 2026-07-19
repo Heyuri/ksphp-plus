@@ -1,0 +1,627 @@
+<!-- Reusable navigation links -->
+<patTemplate:tmpl name="navlinks">
+<header>
+<span class="pagetitle"><a href="{CGIURL}" style="text-decoration: none;">{BBSTITLE}</a></span>
+<span class="link_upper">
+<a href="{INFOPAGE}" title="{TITLE_GO_TO_PR_OFFICE}">{NAV_PR_OFFICE}</a>&nbsp;<a href="mailto:{ADMINMAIL}" title="{TITLE_EMAIL_ADMIN}">{NAV_CONTACT}</a> <a href="{DEFURL}&amp;m=g" target="_blank" title="{TITLE_BROWSE_OLD_POSTS}">{NAV_MESSAGE_LOGS}</a> <a href="{CGIURL}?{QUERY}&amp;m=tree" title="{TITLE_DISPLAY_THREADS_BRANCHES}">{TITLE_TREE_VIEW}</a> |&nbsp;<a href="{CGIURL}?m=login" title="{TITLE_ADMIN_LOGIN}">{NAV_MANAGE}</a> |&nbsp;<a href="#bottom" title="{TITLE_BOTTOM}">▼</a>
+</span>
+</header>
+</patTemplate:tmpl>
+<!--KuzuhaScriptPHP HTML template main-->
+<!-- HTML header -->
+<patTemplate:tmpl name="header">
+<!DOCTYPE html>
+<html lang="{META_LANGUAGE}" prefix="og: http://ogp.me/ns#">
+<head>
+    <meta charset="UTF-8">
+    <meta name="description" content="{META_DESCRIPTION}">
+    <meta name="keywords" content="{META_KEYWORDS}">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="format-detection" content="telephone=no, address=no">
+    <link rel="icon" href="favicon.ico" type="image/vnd.microsoft.icon">
+    <link rel="canonical" href="https://hiru.coresv.com/bbs.php">
+    <meta name="theme-color" content="#{C_BACKGROUND}">
+    <meta name="msapplication-TileColor" content="#{C_BACKGROUND}">
+    <meta property="og:title" content="{TITLE}">
+    <meta property="og:type" content="article">
+    <meta property="og:locale" content="{OG_LOCALE}">
+    <meta property="og:description" content="{META_DESCRIPTION}">
+    <!-- <meta property="og:url" content="URL of the page"> -->
+    <meta property="og:site_name" content="{TITLE}">
+    <title>{TITLE}</title>
+    <script type="text/javascript">window.KSPHP_LANG = {JS_LANG_JSON};</script>
+    <script type="text/javascript" src="js/kaomoji.js"></script>
+    <script type="text/javascript" src="js/ayashiibreaker.js" defer></script>
+    <script type="text/javascript" src="js/upthumb.js" defer></script>
+    <script type="text/javascript" src="js/imgthumb.js" defer></script>
+    <script type="text/javascript" src="js/vidembed.js" defer></script>
+    {CUSTOMHEAD}
+    <link rel="stylesheet" href="css.php?c={C}">
+    <style>{CUSTOMSTYLE}</style>
+    
+
+{CUSTOMHEAD}
+</head>
+<body>
+<a id="top"></a>
+</patTemplate:tmpl>
+
+<!-- Horizontal line -->
+<patTemplate:tmpl name="hr">
+<hr>
+</patTemplate:tmpl>
+
+<!-- Copyright notice -->
+<patTemplate:tmpl name="copyright">
+<hr>
+<p class="copyright">
+    <a href="https://github.com/Heyuri/ksphp-plus" target="_blank">{BRAND_NAME}</a> {VERSION} + vanish.js
+</p>
+</patTemplate:tmpl>
+
+<!-- Error message -->
+<patTemplate:tmpl name="error">
+<p class="error">{ERR_MESSAGE}</p>
+<patTemplate:tmpl name="backnavi" visibility="hidden">
+<span class="bbsmsg"><a href="{DEFURL}" title="{TITLE_RETURN_PREV_PAGE}">{RETURN}</a></span>
+</patTemplate:tmpl>
+</patTemplate:tmpl>
+
+<!-- Posts -->
+<patTemplate:tmpl name="message">
+<span class= "ngline">
+    <div class="m" id="m{POSTID}">
+    <span class="nw">
+        <span class="mnum">{POSTID}.</span>
+        <span class="ms">{TITLE}</span>&nbsp;&nbsp;
+        <span class="mu">{MSG_USER_LABEL}</span>
+        <span class="mun">{USER}</span>&nbsp;&nbsp;
+        <span class="md">{MSG_POST_DATE_LABEL} {WDATE}<a id="a{POSTID}">&nbsp;</a><span class="nb">{BTN}</span>
+    </span>
+    <div class="contents">
+        <pre class="msgnormal">{MSG}</pre>
+    </div>
+    <patTemplate:link src="envlist" />
+    </div>
+</span>
+<hr>
+</patTemplate:tmpl>
+
+<!-- Display environment variables of posts -->
+<patTemplate:tmpl name="envlist" visibility="hidden">
+<div class="env">{ENVADDR}{ENVBR}{ENVUA}</div>
+</patTemplate:tmpl>
+
+<!-- Upper area of the main bulletin board (section above the post loop) -->
+<patTemplate:tmpl name="main_upper">
+<header>
+<span class="pagetitle"><a href="{CGIURL}" style="text-decoration: none;">{BBSTITLE}</a></span>
+<span class="link_upper">
+<a href="{INFOPAGE}" title="{TITLE_GO_TO_PR_OFFICE}">{NAV_PR_OFFICE}</a> <a href="mailto:{ADMINMAIL}" title="{TITLE_EMAIL_ADMIN}">{NAV_CONTACT}</a> <a href="{DEFURL}&amp;m=g" target="_blank" title="{TITLE_BROWSE_OLD_POSTS}">{NAV_MESSAGE_LOGS}</a> <a href="{CGIURL}?{QUERY}&amp;m=tree" title="{TITLE_DISPLAY_THREADS_BRANCHES}">{TITLE_TREE_VIEW}</a> |&nbsp;<a href="{CGIURL}?m=login" title="{TITLE_ADMIN_LOGIN}">{NAV_MANAGE}</a> |&nbsp;<a href="#bottom" title="{TITLE_BOTTOM}">▼</a>
+</span>
+</header>
+<patTemplate:link src="form" />
+</patTemplate:tmpl>
+
+<!-- Lower area of the main bulletin board (section below the post loop) -->
+<patTemplate:tmpl name="main_lower">
+</main>
+<p class="msgmore">{MSGMORE}</p>
+<table border="0">
+    <tr>
+        <patTemplate:tmpl name="nextpage">
+        <td>
+            <form method="post" action="{CGIURL}">
+                <input type="hidden" name="u" value="{U}" />
+                <input type="hidden" name="i" value="{I}" />
+                <input type="hidden" name="d" value="{MSGDISP}" />
+                <input type="hidden" name="c" value="{C}" />
+                <input type="hidden" name="p" value="{TOPPOSTID}" />
+                <input type="hidden" name="b" value="{EINDEX}" />
+                <input type="submit" name="reload" value="{NEXT_PAGE}" class="btn" title="Alt(+Shift)+N" />
+            </form>
+        </td>
+    </patTemplate:tmpl>
+    <td>
+        <form method="post" action="{CGIURL}">
+            <input type="hidden" name="u" value="{U}" />
+            <input type="hidden" name="i" value="{I}" />
+            <input type="hidden" name="d" value="{MSGDISP}" />
+            <input type="hidden" name="c" value="{C}" />
+            <input type="hidden" name="p" value="{TOPPOSTID}" />
+            <input type="submit" name="reload" value="{RELOAD}" class="btn" />
+        </form>
+    </td>
+    <patTemplate:tmpl name="readnew">
+    <td>
+        <form method="post" action="{CGIURL}">
+            <input type="hidden" name="u" value="{U}" />
+            <input type="hidden" name="i" value="{I}" />
+            <input type="hidden" name="d" value="{MSGDISP}" />
+            <input type="hidden" name="c" value="{C}" />
+            <input type="hidden" name="p" value="{TOPPOSTID}" />
+            <input type="submit" name="readnew" value="{UNREAD}" class="btn" title="Alt(+Shift)+M" />
+        </form>
+    </td>
+    <td>
+        <input type="button" onclick="location.href='#top'" accesskey="T" value="▲" class="btn" title="{TITLE_TOP_SHORTCUT}">
+    </td>
+</patTemplate:tmpl>
+</tr>
+</table>
+<patTemplate:tmpl name="adminlogin">
+<hr>
+<form method="post" action="{CGIURL}">
+    <input type="hidden" name="m" value="p" />
+    <input type="hidden" name="d" value="{MSGDISP}" />
+    <input type="hidden" name="c" value="{C}" />
+    <input type="hidden" name="p" value="{TOPPOSTID}" />
+    <input type="hidden" name="g" value="{GZIPU}" />
+    <input type="hidden" name="hide" value="{HIDEFORM}" />
+    <input type="hidden" name="loff" value="{LINKOFF}" />
+    <input type="hidden" name="sim" value="{SHOWIMG}" />
+    <input size="8" type="password" name="u" maxlength="30" value="{U}" />
+    <input type="submit" name="write" value="{TITLE_ADMIN_POST}" class="btn" />
+</form>
+</patTemplate:tmpl>
+<patTemplate:link src="copyright" />
+</patTemplate:tmpl>
+
+<!-- Post form -->
+<patTemplate:tmpl name="form">
+<form method="post" enctype="multipart/form-data" action="{CGIURL}">
+    {MODE}
+    <input type="hidden" name="c" value="{C}" />
+    <input type="hidden" name="p" value="{TOPPOSTID}" />
+    <input type="hidden" name="pc" value="{PCODE}" />
+    <input type="hidden" name="g" value="{GZIPU}" />
+    
+    <input type="hidden" name="e-mail" value="">
+    <input type="hidden" name="username" value="">
+    <input type="hidden" name="subject" value="">
+    <input type="hidden" name="comment" value="">
+    <input type="hidden" name="firstname" value="">
+    <input type="hidden" name="lastname" value="">
+    <input type="hidden" name="city" value="">
+    <input type="hidden" name="state" value="">
+    <input type="hidden" name="zipcode" value="">
+    <input type="hidden" name="country" value="">
+    <input type="hidden" name="url" value="">
+
+    <patTemplate:tmpl name="postform" type="condition" conditionvar="mode">
+    <patTemplate:sub condition="default">
+    <div class="postform">
+        <p>
+            <label class="postform-label" for="name1">{FORM_NAME_LABEL}</label><input size="20" type="text" name="u" accesskey="1" maxlength="{MAXNAMELENGTH}" value="{U}" placeholder="" title="You can use a #trip, up to {MAXNAMELENGTH} characters, Alt(+Shift)+1" id="name1" /><br>
+            <label class="postform-label" for="mail1">{FORM_EMAIL_LABEL}</label><input size="30" type="text" name="i" accesskey="2" maxlength="{MAXMAILLENGTH}" value="{I}" placeholder="mail@example.com" title="Up to {MAXMAILLENGTH} characters, Alt(+Shift)+2" id="mail1" /><br>
+            <label class="postform-label" for="title1">{FORM_TITLE_LABEL}</label><input size="30" type="text" name="t" accesskey="3" maxlength="{MAXTITLELENGTH}" value="{DTITLE}" title="Up to {MAXTITLELENGTH} characters, Alt(+Shift)+3" id="title1" />
+            <input type="submit" name="post" accesskey="P" value="{POST_RELOAD}" class="btn" title="{TITLE_POST_RELOAD_SHORTCUT_P}" />
+            <input type="reset" accesskey="K" value="{CLEAR}" class="btn" title="Alt(+Shift)+K" />
+        </p>
+        <p>
+            <label for="contents1">{FORM_CONTENTS_LABEL}</label>
+            <span class="pfhelp">
+                {FORM_CONTENTS_HELP_SIMPLE}
+            </span>
+            <br>
+            <textarea rows="5" cols="70" name="v" accesskey="4" maxlength="10000" placeholder="" title="Alt(+Shift)+4" id="contents1">{DMSG}</textarea>
+        </p>
+        <!-- Default "Quick Access" kaomoji -->
+		<input type="button" class="kaomoji" onClick="insertThisInThere('ヽ(´ー｀)ノ','contents1')" value="ヽ(´ー｀)ノ" />
+		<input type="button" class="kaomoji" onClick="insertThisInThere('(;´Д`)','contents1')" value="(;´Д`)" />
+		<input type="button" class="kaomoji" onClick="insertThisInThere('ヽ(´∇`)ノ','contents1')" value="ヽ(´∇`)ノ" />
+		<input type="button" class="kaomoji" onClick="insertThisInThere('(;^Д^)','contents1')" value="(;^Д^)" />
+		<input type="button" class="kaomoji" onClick="insertThisInThere('Σ(;ﾟ∇ﾟ)','contents1')" value="Σ(;ﾟ∇ﾟ)" />
+        <br>
+		<input type="button" class="kaomoji" onClick="insertThisInThere('(;`Д´)','contents1')" value="(;`Д´)" />
+        <input type="button" class="kaomoji" onClick="insertThisInThere('(´-｀)','contents1')" value="(´-｀)" />
+		<input type="button" class="kaomoji" onClick="insertThisInThere('(´￢`)','contents1')" value="(´￢`)" />
+		<input type="button" class="kaomoji" onClick="insertThisInThere('(´人｀)','contents1')" value="(´人｀)" />
+		<input type="button" class="kaomoji" onClick="insertThisInThere('ъ( ﾟｰ^)','contents1')" value="ъ( ﾟｰ^)" />
+		<input type="button" class="kaomoji" onClick="insertThisInThere('(^^;ﾜﾗ','contents1')" value="(^^;ﾜﾗ" />
+
+        <!-- Toggle to expand kaomoji picker -->
+        <br><br>
+        <a href="javascript:void(0);" id="kaomojiAltToggle" class="kaomoji" onclick="toggleKaomojiAlt()" style="text-decoration: none;">［▼ {KAOMOJI_SHOW_MORE}］</a>
+
+<!-- Expanded kaomoji picker -->
+<div id="kaomoji-alt" hidden>
+	<p class="pfhelp">
+		{KAOMOJI_INTRO}
+	</p>
+
+	<fieldset>
+		<legend>{KAOMOJI_CAT_MATTARI}</legend>
+		<input type="button" class="kaomoji" onClick="insertThisInThere('(´ー｀)','contents1')" value="(´ー｀)" />
+        <input type="button" class="kaomoji" onClick="insertThisInThere('(´ー`)','contents1')" value="(´ー`)" />
+		<input type="button" class="kaomoji" onClick="insertThisInThere('(;´ー｀)','contents1')" value="(;´ー｀)" />
+        <input type="button" class="kaomoji" onClick="insertThisInThere('(;´ー`)','contents1')" value="(;´ー`)" />
+		<input type="button" class="kaomoji" onClick="insertThisInThere('(*´ー｀)','contents1')" value="(*´ー｀)" />
+        <input type="button" class="kaomoji" onClick="insertThisInThere('(*´ー`)','contents1')" value="(*´ー`)" />
+		<input type="button" class="kaomoji" onClick="insertThisInThere('ヽ(´ー｀)ノ','contents1')" value="ヽ(´ー｀)ノ" />
+        <input type="button" class="kaomoji" onClick="insertThisInThere('ヽ(´ー`)ノ','contents1')" value="ヽ(´ー`)ノ" />
+		<input type="button" class="kaomoji" onClick="insertThisInThere('ヽ(;´ー｀)ノ','contents1')" value="ヽ(;´ー｀)ノ" />
+        <input type="button" class="kaomoji" onClick="insertThisInThere('ヽ(;´ー`)ノ','contents1')" value="ヽ(;´ー`)ノ" />
+		<input type="button" class="kaomoji" onClick="insertThisInThere('ヽ(*´ー｀)ノ','contents1')" value="ヽ(*´ー｀)ノ" />
+        <input type="button" class="kaomoji" onClick="insertThisInThere('ヽ(*´ー`)ノ','contents1')" value="ヽ(*´ー`)ノ" />
+		<input type="button" class="kaomoji" onClick="insertThisInThere('～(´ー｀～))))','contents1')" value="～(´ー｀～))))" />
+		<input type="button" class="kaomoji" onClick="insertThisInThere('(´ー`)ﾉ⌒','contents1')" value="(´ー`)ﾉ⌒" />
+		<input type="button" class="kaomoji" onClick="insertThisInThere('ε≡Ξヽ(´ー｀)ﾉ','contents1')" value="ε≡Ξヽ(´ー｀)ﾉ" />
+		<input type="button" class="kaomoji" onClick="insertThisInThere('ﾉ(´ｰ` )ヽ','contents1')" value="ﾉ(´ｰ` )ヽ" />
+		<input type="button" class="kaomoji" onClick="insertThisInThere('(´ｰ`)ﾆﾔﾆﾔ','contents1')" value="(´ｰ`)ﾆﾔﾆﾔ" />
+        <input type="button" class="kaomoji" onClick="insertThisInThere('(´ー｀)人','contents1')" value="(´ー｀)人" />
+	</fieldset>
+    <br>
+	<fieldset>
+		<legend>{KAOMOJI_CAT_DAUSO}</legend>
+		<input type="button" class="kaomoji" onClick="insertThisInThere('(´Д`)','contents1')" value="(´Д`)" />
+		<input type="button" class="kaomoji" onClick="insertThisInThere('(;´Д`)','contents1')" value="(;´Д`)" />
+		<input type="button" class="kaomoji" onClick="insertThisInThere('(*´Д`)','contents1')" value="(*´Д`)" />
+		<input type="button" class="kaomoji" onClick="insertThisInThere('(´Дﾞ)','contents1')" value="(´Дﾞ)" />
+        <input type="button" class="kaomoji" onClick="insertThisInThere('(´－｀)','contents1')" value="(´－｀)" />
+		<input type="button" class="kaomoji" onClick="insertThisInThere(' (´-｀)','contents1')" value=" (´-｀)" />
+		<input type="button" class="kaomoji" onClick="insertThisInThere('(ρ_;)','contents1')" value="(ρ_;)" />
+		<input type="button" class="kaomoji" onClick="insertThisInThere('(ﾉД`､)','contents1')" value="(ﾉД`､)" />
+		<input type="button" class="kaomoji" onClick="insertThisInThere('(ﾉД`)','contents1')" value="(ﾉД`)" />
+		<input type="button" class="kaomoji" onClick="insertThisInThere('(TДT)','contents1')" value="(TДT)" />
+        <input type="button" class="kaomoji" onClick="insertThisInThere('(´～`)','contents1')" value="(´～`)" />
+	</fieldset>
+    <br>
+	<fieldset>
+		<legend>{KAOMOJI_CAT_ANGRY}</legend>
+		<input type="button" class="kaomoji" onClick="insertThisInThere('ヽ(`Д´)ﾉ','contents1')" value="ヽ(`Д´)ﾉ" />
+		<input type="button" class="kaomoji" onClick="insertThisInThere('(｀∇´)','contents1')" value="(｀∇´)" />
+		<input type="button" class="kaomoji" onClick="insertThisInThere('(｀ー´)','contents1')" value="(｀ー´)" />
+		<input type="button" class="kaomoji" onClick="insertThisInThere('(｀～´)','contents1')" value="(｀～´)" />
+		<input type="button" class="kaomoji" onClick="insertThisInThere('(;`-´)','contents1')" value="(;`-´)" />
+		<input type="button" class="kaomoji" onClick="insertThisInThere('(`Д´)','contents1')" value="(`Д´)" />
+        <input type="button" class="kaomoji" onClick="insertThisInThere('(`ДＴ)','contents1')" value="(`ДＴ)" />
+        <input type="button" class="kaomoji" onClick="insertThisInThere('(ﾟ血ﾟ)','contents1')" value="(ﾟ血ﾟ)" />
+        <input type="button" class="kaomoji" onClick="insertThisInThere('(*ﾟдﾟ)','contents1')" value="(*ﾟдﾟ)" />
+	</fieldset>
+    <br>
+	<fieldset>
+		<legend>{KAOMOJI_CAT_EHHH}</legend>
+		<input type="button" class="kaomoji" onClick="insertThisInThere('(ﾟДﾟ)','contents1')" value="(ﾟДﾟ)" />
+        <input type="button" class="kaomoji" onClick="insertThisInThere('(ﾟ∇ﾟ)>','contents1')" value="(ﾟ∇ﾟ)>" />
+        <input type="button" class="kaomoji" onClick="insertThisInThere('(;ﾟ∇ﾟ)','contents1')" value="(;ﾟ∇ﾟ)" />
+		<input type="button" class="kaomoji" onClick="insertThisInThere('Σ(;ﾟДﾟ)','contents1')" value="Σ(;ﾟДﾟ)" />
+		<input type="button" class="kaomoji" onClick="insertThisInThere('(ﾟ∇ﾟ)','contents1')" value="(ﾟ∇ﾟ)" />
+	</fieldset>
+    <br>
+	<fieldset>
+		<legend>{KAOMOJI_CAT_GESTURES}</legend>
+		<input type="button" class="kaomoji" onClick="insertThisInThere('( \'-\')ﾉ','contents1')" value="( '-')ﾉ" />
+		<input type="button" class="kaomoji" onClick="insertThisInThere('( \'ｰ\')ﾉ','contents1')" value="( 'ｰ')ﾉ" />
+		<input type="button" class="kaomoji" onClick="insertThisInThere('ﾉ(´д｀)','contents1')" value="ﾉ(´д｀)" />
+		<input type="button" class="kaomoji" onClick="insertThisInThere('@_@)ﾉ','contents1')" value="@_@)ﾉ" />
+        <input type="button" class="kaomoji" onClick="insertThisInThere('(●===(`Д´)','contents1')" value="(●===(`Д´)" />
+		<input type="button" class="kaomoji" onClick="insertThisInThere('（゜ρ゜）ﾉ','contents1')" value="（゜ρ゜）ﾉ" />
+		<input type="button" class="kaomoji" onClick="insertThisInThere('ｰﾟ)ﾉ','contents1')" value="ｰﾟ)ﾉ" />
+		<input type="button" class="kaomoji" onClick="insertThisInThere('(ﾟДﾟ)ﾉミ★凸へぇー','contents1')" value="(ﾟДﾟ)ﾉミ★凸へぇー" />
+		<input type="button" class="kaomoji" onClick="insertThisInThere('ヽ(∂_∂)/','contents1')" value="ヽ(∂_∂)/" />
+        <input type="button" class="kaomoji" onClick="insertThisInThere('(´∇`)σ','contents1')" value="(´∇`)σ" />
+	</fieldset>
+    <br>
+	<fieldset>
+		<legend>{KAOMOJI_CAT_SLEEPY}</legend>
+		<input type="button" class="kaomoji" onClick="insertThisInThere('( ´Ο`)ﾌｧｰ','contents1')" value="( ´Ο`)ﾌｧｰ" />
+		<input type="button" class="kaomoji" onClick="insertThisInThere('(-_-)','contents1')" value="(-_-)" />
+		<input type="button" class="kaomoji" onClick="insertThisInThere('(ノーヽ)','contents1')" value="(ノーヽ)" />
+		<input type="button" class="kaomoji" onClick="insertThisInThere('(ノー｀)','contents1')" value="(ノー｀)" />
+		<input type="button" class="kaomoji" onClick="insertThisInThere('(`ー´)','contents1')" value="(`ー´)" />
+		<input type="button" class="kaomoji" onClick="insertThisInThere('(ﾟｰﾟ)','contents1')" value="(ﾟｰﾟ)" />
+		<input type="button" class="kaomoji" onClick="insertThisInThere('(ﾟーﾟ)','contents1')" value="(ﾟーﾟ)" />
+		<input type="button" class="kaomoji" onClick="insertThisInThere('(・∀・)','contents1')" value="(・∀・)" />
+		<input type="button" class="kaomoji" onClick="insertThisInThere('( ´ω`)','contents1')" value="( ´ω`)" />
+	</fieldset>
+    <br>
+    <fieldset>
+		<legend>{KAOMOJI_CAT_DROOLING}</legend>
+        <input type="button" class="kaomoji" onClick="insertThisInThere('(´￢｀)','contents1')" value="(´￢｀)" />
+        <input type="button" class="kaomoji" onClick="insertThisInThere('(´π｀)','contents1')" value="(´π｀)" />
+		<input type="button" class="kaomoji" onClick="insertThisInThere('ヽ(´π`)ノ','contents1')" value="ヽ(´π`)ノ" />
+		<input type="button" class="kaomoji" onClick="insertThisInThere('(*´ρ`)','contents1')" value="(*´ρ`)" />
+        <input type="button" class="kaomoji" onClick="insertThisInThere('ヽ(ﾟρﾟ)ノ','contents1')" value="ヽ(ﾟρﾟ)ノ" />
+    </fieldset>
+    <br>
+	<fieldset>
+		<legend>{KAOMOJI_CAT_SMOKING}</legend>
+        <input type="button" class="kaomoji" onClick="insertThisInThere('(´ー`)y-~~','contents1')" value="(´ー`)y-~~" />
+        <input type="button" class="kaomoji" onClick="insertThisInThere('(´ｰ`)y-~~','contents1')" value="(´ｰ`)y-~~" />
+		<input type="button" class="kaomoji" onClick="insertThisInThere('(´Д‘)Y-~~','contents1')" value="(´Д‘)Y-~~" />
+		<input type="button" class="kaomoji" onClick="insertThisInThere('~~~===－y(´Д‘)','contents1')" value="~~~===－y(´Д‘)" />
+		<input type="button" class="kaomoji" onClick="insertThisInThere('~~===-Y(´Д‘)','contents1')" value="~~===-Y(´Д‘)" />
+		<input type="button" class="kaomoji" onClick="insertThisInThere('~=====(´Д‘)','contents1')" value="~=====(´Д‘)" />
+		<input type="button" class="kaomoji" onClick="insertThisInThere('~~-yζﾟ)','contents1')" value="~~-yζﾟ)" />
+		<input type="button" class="kaomoji" onClick="insertThisInThere('゜゜゜゜゜-y(´Д`)。o0○','contents1')" value="゜゜゜゜゜-y(´Д`)。o0○" />
+	</fieldset>
+    <br>
+	<fieldset>
+		<legend>{KAOMOJI_CAT_FUN}</legend>
+		<input type="button" class="kaomoji" onClick="insertThisInThere('(^Д^)','contents1')" value="(^Д^)" />
+		<input type="button" class="kaomoji" onClick="insertThisInThere('(;\'-\')','contents1')" value="(;'-')" />
+        <input type="button" class="kaomoji" onClick="insertThisInThere('(⌒∇⌒ゞ)','contents1')" value="(⌒∇⌒ゞ)" />
+		<input type="button" class="kaomoji" onClick="insertThisInThere('┐(ﾟ～ﾟ)┌','contents1')" value="┐(ﾟ～ﾟ)┌" />
+        <input type="button" class="kaomoji" onClick="insertThisInThere('（・ω・）','contents1')" value="（・ω・）" />
+		<input type="button" class="kaomoji" onClick="insertThisInThere('(*\'-\')','contents1')" value="(*'-')" />
+		<input type="button" class="kaomoji" onClick="insertThisInThere('(*＾▽＾*)','contents1')" value="(*＾▽＾*)" />
+		<input type="button" class="kaomoji" onClick="insertThisInThere('わぁい♪ヽ(∇⌒ヽ)(ノ⌒∇）ノわぁい♪','contents1')" value="わぁい♪ヽ(∇⌒ヽ)(ノ⌒∇）ノわぁい♪" />
+		<input type="button" class="kaomoji" onClick="insertThisInThere('(σﾟーﾟ)σ','contents1')" value="(σﾟーﾟ)σ" />
+		<input type="button" class="kaomoji" onClick="insertThisInThere('～(ﾟёﾟ～)','contents1')" value="～(ﾟёﾟ～)" />
+	</fieldset>
+</div>
+        <p>
+            <label for="url1">URL</label>
+            <br>
+            <input size="70" type="text" name="l" accesskey="5" maxlength="255" value="{DLINK}" placeholder="http://" title="Alt(+Shift)+5" id="url1" />
+        </p>
+    </div>
+</patTemplate:sub>
+<patTemplate:sub condition="image">
+<div class="postform">
+    <p>
+        <label class="postform-label" for="name2">{FORM_NAME_LABEL}</label><input size="20" type="text" name="u" accesskey="1" maxlength="{MAXNAMELENGTH}" value="{U}" placeholder="" title="You can use a #trip, up to {MAXNAMELENGTH} characters, Alt(+Shift)+1" id="name2" /><br>
+        <label class="postform-label" for="mail2">{FORM_EMAIL_LABEL}</label><input size="30" type="text" name="i" accesskey="2" maxlength="{MAXMAILLENGTH}" value="{I}" placeholder="mail@example.com" title="Up to {MAXMAILLENGTH} characters, Alt(+Shift)+2" id="mail2" /><br>
+        <label class="postform-label" for="title2">{FORM_TITLE_LABEL}</label><input size="30" type="text" name="t" accesskey="3" maxlength="{MAXTITLELENGTH}" value="{DTITLE}" title="Up to {MAXTITLELENGTH} characters, Alt(+Shift)+3" id="title2" />
+        <input type="submit" name="post" accesskey="P" value="{POST_RELOAD}" class="btn" title="{TITLE_POST_RELOAD_SHORTCUT_P}" />
+        <input type="reset" accesskey="K" value="{CLEAR}" class="btn" title="Alt(+Shift)+K" />
+    </p>
+    <p>
+        <label for="contents2">{FORM_CONTENTS_LABEL}</label>
+        <span class="pfhelp">
+            {FORM_CONTENTS_HELP_IMAGE}
+        </span>
+        <br>
+        <textarea rows="5" cols="70" name="v" accesskey="4" maxlength="10000" placeholder="" title="Alt(+Shift)+4" id="contents2">{DMSG}</textarea>
+    </p>
+    <p>
+        <label for="url2">URL</label>
+        <br>
+        <input size="70" type="text" name="l" accesskey="5" maxlength="255" value="{DLINK}" placeholder="http://" title="Alt(+Shift)+5" id="url2" />
+    </p>
+    <p>
+        {IMAGE_UPLOAD_LABEL}
+        <span class="pfhelp">
+            {IMAGE_UPLOAD_HELP}
+        </span>
+        <br>
+        <input type="hidden" name="MAX_FILE_SIZE" value="{MAX_FILE_SIZE}">
+        <input size="40" type="file" name="file" accesskey="7" maxlength="255" value="" title="Alt(+Shift)+7" />
+    </p>
+</div>
+</patTemplate:sub>
+<patTemplate:sub condition="hide">
+<input type="hidden" name="u" value="{U}" />
+<input type="hidden" name="i" value="{I}" />
+</patTemplate:sub>
+</patTemplate:tmpl>
+<patTemplate:tmpl name="extraform">
+<div class="small">
+    <label for="num1">{POSTS_DISPLAYED_LABEL}</label>&nbsp;<input type="number" size="2" name="d" accesskey="6" value="{MSGDISP}" min="0" title="Alt(+Shift)+6" id="num1" />&nbsp;
+    <patTemplate:tmpl name="formconfig">
+    <label for="a1">{AUTO_LINK_URLS_LABEL}</label><input type="checkbox" name="a" accesskey="U" value="checked"{CHK_A} title="Alt(+Shift)+U" id="a1" />&nbsp;
+    <!--<label for="indention1">Auto line breaks</label><input type="checkbox" name="wrap" accesskey="A" value="checked"{CHK_WRAP} title="Alt(+Shift)+A" id="indention1" />&nbsp; -->
+    <label for="hide1">{LOG_READING_MODE_LABEL}</label><input type="checkbox" name="hide" accesskey="I" value="checked"{CHK_HIDE} title="Alt(+Shift)+I" id="hide1" />&nbsp;
+</patTemplate:tmpl>
+<label for="loff1">{HIDE_LINK_LINE_LABEL}</label><input type="checkbox" name="loff" accesskey="L" value="checked"{CHK_LOFF} title="Alt(+Shift)+L" id="loff1" />&nbsp;
+<patTemplate:tmpl name="sicheck" visibility="hidden">
+<label for="sim1">{SHOW_IMAGES_LABEL}</label><input type="checkbox" name="sim" accesskey="S" value="checked"{CHK_SI} title="Alt(+Shift)+S" id="sim1" />&nbsp;
+</patTemplate:tmpl>
+<input type="submit" name="setup" accesskey="C" value="{USER_SETTINGS}" class="btn" title="{TITLE_SETTINGS_SHORTCUT}" />
+</div>
+<patTemplate:tmpl name="counterrow">
+    <br>
+    <div>
+        <patTemplate:tmpl name="counter">
+            {COUNTER_TEXT}　
+        </patTemplate:tmpl>
+        <patTemplate:tmpl name="mbrcount">
+            {MBRCOUNT_TEXT}　
+        </patTemplate:tmpl>
+        {LOGSAVE_TEXT}
+    </div>
+</patTemplate:tmpl>
+<patTemplate:tmpl name="linkrow">
+<hr>
+<div class="link_row">
+    <a href="{INFOPAGE}" title="{TITLE_TO_PR_OFFICE}">{NAV_PR_OFFICE}</a>&nbsp;|&nbsp;<a href="{DEFURL}&amp;m=g" target="_blank" title="{TITLE_BROWSE_OLD_POSTS}">{NAV_MESSAGE_LOGS}</a>
+    {BBSLINK}
+</div>
+</patTemplate:tmpl>
+<p style="margin:5px;"></p>
+<patTemplate:tmpl name="helprow">
+<hr>
+<div class="small">
+<span title="{TITLE_POST_REPLY}"><a class="help">{TXTFOLLOW}</a>:&nbsp;{TITLE_FOLLOWUP}</span>　<span title="{TITLE_LIST_USER_POSTS}"><a class="help">{TXTAUTHOR}</a>:&nbsp;{TITLE_SEARCH_BY_USER}</span>　<span title="{TITLE_DISPLAY_REPLY_THREAD}"><a class="help">{TXTTHREAD}</a>:&nbsp;{THREAD_LABEL}</span>　<span title="{TITLE_DISPLAY_AS_TREE}"><a class="help">{TXTTREE}</a>:&nbsp;{TREE_LABEL}</span>　
+<patTemplate:tmpl name="helpundo">
+<span title="{TITLE_DELETE_LAST_POST}"><a class="help">{TXTUNDO}</a>:&nbsp;{DELETE_PREVIOUS_POST}</span>
+</patTemplate:tmpl>
+</div>
+<hr>
+</patTemplate:tmpl>
+<p style="margin:5px;"></p>
+<patTemplate:tmpl name="btnrow">
+<div class="small">
+    <patTemplate:tmpl name="postbtn" type="Condition" conditionvar="HIDEFORM">
+    <patTemplate:sub condition="default">
+    <input type="submit" name="post" accesskey="R" value="{POST_RELOAD}" class="btn" title="{TITLE_POST_RELOAD_SHORTCUT_R}" />
+</patTemplate:sub>
+<patTemplate:sub condition="1">
+<input type="submit" name="post" accesskey="R" value="{RELOAD}" class="btn" title="Alt(+Shift)+R" />
+</patTemplate:sub>
+</patTemplate:tmpl>
+<patTemplate:tmpl name="readnewbtn">
+<input type="submit" name="readnew" accesskey="M" value="{UNREAD}" class="btn" title="Alt(+Shift)+M" />
+<!--<input type="submit" name="readzero" accesskey="0" value="0 posts" class="btn" title="Alt(+Shift)+0" />-->
+</patTemplate:tmpl>
+<patTemplate:tmpl name="newpostbtn">
+<input type="submit" name="write" accesskey="W" value=" {NEW_POST} " class="btn" title="Alt(+Shift)+W" />
+</patTemplate:tmpl>
+<input type="button" onclick="location.href='#bottom'" accesskey="B" value="▼" class="btn" title="{TITLE_BOTTOM_SHORTCUT}">
+<a class="mu" href="./bbs.php?c={C}&amp;d=30&amp;p={TOPPOSTID}&amp;d=30" accesskey="J">{LATEST_30_POSTS}</a>&nbsp;
+<span class="ngset"></span>
+</div>
+</patTemplate:tmpl>
+</form>
+<hr>
+<main>
+</patTemplate:tmpl>
+</patTemplate:tmpl>
+
+<!-- Follow-up page (reply page) -->
+<patTemplate:tmpl name="follow">
+<hr>
+<patTemplate:link src="message" />
+<table><tr><td><span class="bbsmsg">{TITLE_FOLLOWUP}　<a href="{DEFURL}" title="{TITLE_RETURN_PREV_PAGE2}">←{RETURN}</a></span></td></tr></table>
+<patTemplate:link src="form" />
+<div class="small">
+    <label for="a2">{AUTO_LINK_URLS_LABEL}</label> <input type="checkbox" name="a" value="checked"{CHK_A} id="a2" />
+</div>
+<input type="hidden" name="f" value="{FOLLOWID}" />
+<input type="hidden" name="ff" value="{FF}" />
+<input type="hidden" name="ac" value="{AC}" />
+<input type="hidden" name="s" value="{SEARCHID}" />
+<input type="hidden" name="g" value="{GZIPU}" />
+<input type="hidden" name="d" value="{MSGDISP}" />
+<hr>
+</div>
+</form>
+</patTemplate:tmpl>
+
+<!-- New post page -->
+<patTemplate:tmpl name="newpost">
+<table><tr><td><span class="pagetitle"><a href="{DEFURL}" style="text-decoration: none;">{BBSTITLE}</a></span> - {NEW_POST}　<a href="{DEFURL}" title="{TITLE_RETURN_PREV_PAGE2}">←{RETURN}</a></td></tr></table>
+<patTemplate:link src="form" />
+<div class="small">
+    <label for="a3">{AUTO_LINK_URLS_LABEL}</label> <input type="checkbox" name="a" value="checked"{CHK_A} id="a3" />
+</div>
+<input type="hidden" name="g" value="{GZIPU}" />
+<input type="hidden" name="d" value="{MSGDISP}" />
+<input type="hidden" name="hide" value="{HIDEFORM}" />
+<input type="hidden" name="loff" value="{LINKOFF}" />
+<input type="hidden" name="sim" value="{SHOWIMG}" />
+<hr>
+</div>
+</form>
+</patTemplate:tmpl>
+
+<!-- Post search page -->
+<patTemplate:tmpl name="searchlist_upper">
+<hr>
+</patTemplate:tmpl>
+<patTemplate:tmpl name="searchlist_lower">
+<span class="bbsmsg">{SUCCESS}{POSTS_FOUND}　<a href="{DEFURL}" title="{TITLE_RETURN_PREV_PAGE2}">←{RETURN}</a></span>
+</patTemplate:tmpl>
+
+<!-- Post complete -->
+<patTemplate:tmpl name="postcomplete">
+<p>
+<a href="{DEFURL}" accesskey="o" title="{TITLE_RETURN_BBS_SHORTCUT}" ><div class="msg-completed">{POST_COMPLETE}</div></a>
+</p>
+<p>
+    <i>{RETURN_TO_BBS_HELP}</i>
+</p>
+</patTemplate:tmpl>
+
+<!-- Undo process complete -->
+<patTemplate:tmpl name="undocomplete">
+<p>
+<a href="{DEFURL}" accesskey="o" title="{TITLE_RETURN_BBS_SHORTCUT}" ><div class="msg-completed">{DELETION_COMPLETE}</div></a>
+</p>
+<p>
+    <i>{RETURN_TO_BBS_HELP}</i>
+</p>
+</patTemplate:tmpl>
+
+<!-- Settings page -->
+<patTemplate:tmpl name="custom">
+<header><span class="pagetitle"><a href="{DEFURL}" style="text-decoration: none;">{BBSTITLE}</a></span></header>
+<h1>{USER_SETTINGS}</h1>
+<form method="post" action="{CGIURL}">
+    <input type="hidden" name="m" value="c" />
+    <input type="hidden" name="nm" value="{MODE}" />
+    <fieldset>
+    <legend>{DISPLAY_COLORS_LEGEND}</legend>
+        <label for="c1">{TEXT_COLOR_LABEL}</label> # <input type="text" name="C_TEXT" size="7" maxlength="6" value="{C_TEXT}" id="c1" /><br>
+        <label for="c2">{BACKGROUND_COLOR_LABEL}</label> # <input type="text" name="C_BACKGROUND" size="7" maxlength="6" value="{C_BACKGROUND}" id="c2" /><br>
+        <label for="c3">{LINK_COLOR_LABEL}</label> # <input type="text" name="C_A_COLOR" size="7" maxlength="6" value="{C_A_COLOR}" id="c3" /><br>
+        <label for="c4">{VISITED_LINK_COLOR_LABEL}</label> # <input type="text" name="C_A_VISITED" size="7" maxlength="6" value="{C_A_VISITED}" id="c4" /><br>
+        <label for="c5">{ACTIVE_LINK_COLOR_LABEL}</label> # <input type="text" name="C_A_ACTIVE" size="7" maxlength="6" value="{C_A_ACTIVE}" id="c5" /><br>
+        <label for="c6">{MOUSEOVER_LINK_COLOR_LABEL}</label> # <input type="text" name="C_A_HOVER" size="7" maxlength="6" value="{C_A_HOVER}" id="c6" /><br>
+        <label for="c7">{TITLE_COLOR_LABEL}</label> # <input type="text" name="C_SUBJ" size="7" maxlength="6" value="{C_SUBJ}" id="c7" /><br>
+        <label for="c8">{QUOTE_COLOR_LABEL}</label> # <input type="text" name="C_QMSG" size="7" maxlength="6" value="{C_QMSG}" id="c8" />
+    </fieldset>
+    <br>
+    <fieldset>
+        <legend>{ADDITIONAL_FEATURES_LEGEND}</legend>
+        <label for="num2">{POSTS_DISPLAYED_LABEL}</label> <input type="number" size="2" name="d" value="{MSGDISP}" min="0" id="num2" /><br><br>
+        <input type="checkbox" name="g" value="checked"{CHK_G} id="g1" /> <label for="g1">{GZIP_LABEL}</label><br>
+        <patTemplate:tmpl name="custom_hide" type="condition" conditionvar="BBSMODE_ADMINONLY">
+            <patTemplate:sub condition="0">
+                <input type="checkbox" name="hide" value="checked"{CHK_HIDE} id="hide2" /> <label for="hide2">{LOG_READING_MODE_DESC_LABEL}</label><br>
+            </patTemplate:sub>
+            <patTemplate:sub condition="default">
+                <input type="hidden" name="hide" value="checked" />
+            </patTemplate:sub>
+        </patTemplate:tmpl>
+        <patTemplate:tmpl name="custom_a" type="condition" conditionvar="BBSMODE_ADMINONLY">
+            <patTemplate:sub condition="1">
+                <input type="hidden" name="a" value="checked" />
+            </patTemplate:sub>
+            <patTemplate:sub condition="default">
+                <input type="checkbox" name="a" value="checked"{CHK_A} id="a4" /> <label for="a4">{AUTO_LINK_URLS_DESC_LABEL}</label><br>
+            </patTemplate:sub>
+        </patTemplate:tmpl>
+        <input type="checkbox" name="cookie" value="checked"{CHK_COOKIE} id="cookie1" /> <label for="cookie1">{COOKIE_LABEL}</label><br>
+        <input type="checkbox" name="loff" value="checked"{CHK_LOFF} id="loff2" /> <label for="loff2">{HIDE_LINK_ROW_DESC_LABEL}</label><br>
+        <!-- <input type="checkbox" name="sim" value="checked"{CHK_SI} id="sim2" /> <label for="sim2">Show images (will display images posted in imageBBS mode)</label><br> -->
+    </fieldset>
+<br>
+<fieldset>
+        <legend>{FOLLOW_DISPLAY_LEGEND}</legend>
+        <input type="radio" name="fw" value="0"{CHK_FW_0} id="fw1-1" /><label for="fw1-1">{FOLLOW_NEW_WINDOW_LABEL}</label><br>
+        <input type="radio" name="fw" value="1"{CHK_FW_1} id="fw1-2" /><label for="fw1-2">{FOLLOW_SAME_PAGE_LABEL}</label><br>
+</fieldset>
+<!-- <br>
+<fieldset>
+<legend>How to display messages when using 0 post reload</legend>
+<input type="radio" name="rt" value="0"{CHK_RT_0} id="rt1-1" /><label for="rt1-1">Display posts in descending time order (default)</label><br>
+<input type="radio" name="rt" value="1"{CHK_RT_1} id="rt1-2" /><label for="rt1-2">Display posts in ascending time order</label><br>
+</fieldset> -->
+<p>{BOOKMARK_HELP}</p>
+<div><input type="submit" value="{REGISTER}" class="btn" title="{TITLE_SAVE_SETTINGS_RETURN}" /><input type="reset" value="{UNDO_CHANGES}" class="btn" title="{TITLE_RESET_SETTINGS}" /><input type="submit" name="cr" value="{RESTORE_DEFAULTS}" class="btn" title="{TITLE_DELETE_CHANGES_RETURN}" />  <a href="{DEFURL}" title="{TITLE_RETURN_PREV_PAGE2}">{RETURN}</a></div>
+</form>
+</patTemplate:tmpl>
+
+<!-- Redirect via META tag -->
+<patTemplate:tmpl name="redirect">
+<p>
+    <span class="bbsmsg">{REDIRECTING}</span><br><br>
+    <span class="bbsmsg">To:&nbsp;{REDIRECTURL}</span>
+</p>
+</patTemplate:tmpl>
+
+<!-- HTML footer -->
+<patTemplate:tmpl name="footer">
+<footer>
+<patTemplate:tmpl name="duration" visibility="hidden">
+<p><span class="msgmore">{PAGE_GEN_TIME_TEXT}</span>　<a href="#top" title="Top">▲</a></p>
+</patTemplate:tmpl>
+</footer>
+<script type="text/javascript" src="js/vanish.js"></script>
+<script type="text/javascript">(function() 
+{
+    $.autopager(
+    {
+        load: function(current, next)
+        {
+            vanisher.init();
+        }
+    });
+});
+</script>
+<a id="bottom"></a>
+</body>
+</html>
+</patTemplate:tmpl>

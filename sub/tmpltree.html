@@ -1,0 +1,80 @@
+<!-- KuzuhaScriptPHP HTML template for tree view -->
+<!-- Additional styling -->
+<patTemplate:tmpl name="tree_customstyle">
+.bc { color: #{C_BRANCH}; }
+.update { color: #{C_UPDATE}; }
+.newmsg { color: #{C_NEWMSG}; }
+</patTemplate:tmpl>
+
+<!-- Tree view main page -->
+<patTemplate:tmpl name="treeview_upper">
+<header>
+<span class="pagetitle"><a href="{CGIURL}?{QUERY}&amp;m=tree" style="text-decoration: none;">{BBSTITLE}</a></span> - {TITLE_TREEVIEW_MAIN}　
+		<a href="{INFOPAGE}" title="{TITLE_PR_OFFICE}">{NAV_PR_OFFICE}</a> <a href="mailto:{ADMINMAIL}" title="{TITLE_EMAIL_ADMIN}">{NAV_CONTACT}</a> <a href="{DEFURL}&amp;m=g" target="_blank" title="{TITLE_BROWSE_OLD_POSTS}">{NAV_MESSAGE_LOGS}</a> <a href="{DEFURL}" title="{TITLE_STACK_BBS_DISPLAY}">{STANDARD_VIEW}</a> |&nbsp;<a href="{CGIURL}?m=login" title="{TITLE_ADMIN_LOGIN}">{NAV_MANAGE}</a> |&nbsp;<a href="#bottom" title="{TITLE_BOTTOM}">▼</a>
+</header>
+<p></p>
+<patTemplate:link src="form" />
+</patTemplate:tmpl>
+<patTemplate:tmpl name="treeview_lower">
+</main>
+<p class="msgmore">{MSGMORE}</p>
+<table border="0">
+	<tr>
+		<patTemplate:tmpl name="nextpage">
+		<td>
+			<form method="post" action="{CGIURL}">
+				<input type="hidden" name="m" value="tree" />
+				<input type="hidden" name="u" value="{U}" />
+				<input type="hidden" name="i" value="{I}" />
+				<input type="hidden" name="d" value="{MSGDISP}" />
+				<input type="hidden" name="c" value="{C}" />
+				<input type="hidden" name="p" value="{TOPPOSTID}" />
+				<input type="hidden" name="b" value="{EINDEX}" />
+				<input type="submit" name="reload" value="→ {NEXT_PAGE}" class="btn" />
+			</form>
+		</td>
+	</patTemplate:tmpl>
+	<td>
+		<form method="post" action="{CGIURL}">
+			<input type="hidden" name="m" value="tree" />
+			<input type="hidden" name="u" value="{U}" />
+			<input type="hidden" name="i" value="{I}" />
+			<input type="hidden" name="d" value="{MSGDISP}" />
+			<input type="hidden" name="c" value="{C}" />
+			<input type="hidden" name="p" value="{TOPPOSTID}" />
+			<input type="submit" name="reload" value="{RELOAD}" class="btn" />
+		</form>
+	</td>
+	<patTemplate:tmpl name="readnew">
+	<td>
+		<form method="post" action="{CGIURL}">
+			<input type="hidden" name="m" value="tree" />
+			<input type="hidden" name="u" value="{U}" />
+			<input type="hidden" name="i" value="{I}" />
+			<input type="hidden" name="d" value="{MSGDISP}" />
+			<input type="hidden" name="c" value="{C}" />
+			<input type="hidden" name="p" value="{TOPPOSTID}" />
+			<input type="submit" name="readnew" value="{UNREAD}" class="btn" />
+			<input type="button" onclick="location.href='#TOP'" value="▲{TOP_LABEL}" class="btn">
+		</form>
+	</td>
+</patTemplate:tmpl>
+</tr>
+</table>
+<patTemplate:tmpl name="adminlogin">
+<hr>
+<form method="post" action="{CGIURL}">
+	<input type="hidden" name="m" value="p" />
+	<input type="hidden" name="d" value="{MSGDISP}" />
+	<input type="hidden" name="c" value="{C}" />
+	<input type="hidden" name="p" value="{TOPPOSTID}" />
+	<input type="hidden" name="g" value="{GZIPU}" />
+	<input type="hidden" name="hide" value="{HIDEFORM}" />
+	<input type="hidden" name="loff" value="{LINKOFF}" />
+	<input type="hidden" name="sim" value="{SHOWIMG}" />
+	<input size="8" type="password" name="u" maxlength="30" value="{U}" />
+	<input type="submit" name="write" value="{TITLE_ADMIN_POST}" class="btn" />
+</form>
+</patTemplate:tmpl>
+<patTemplate:link src="copyright" />
+</patTemplate:tmpl>
