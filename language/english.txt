@@ -1,0 +1,338 @@
+# ksphp-plus language file
+# Format: KEY=value  (no spaces around "=" -- anything after "=" is taken
+# literally, including leading/trailing spaces, up to end of line)
+# Lines starting with "#" or ";" are comments. Blank lines are ignored.
+# Encoding: UTF-8, no BOM.
+# Placeholders like {MAXNAMELENGTH} are substituted by the script and must
+# be kept as-is (same spelling, including the curly braces).
+
+# Service / access
+BBS_OUT_OF_SERVICE=This bulletin board is currently out of service.
+ACCESS_PROHIBITED=Access is prohibited.
+
+# Generic / IO errors
+FAILED_TO_READ_MESSAGE=Failed to read message
+FILE_AUTOCREATED=%s was not found, so it has been newly created.
+FAILED_TO_OPEN_LOG=Failed to open log file: %s
+FAILED_TO_OUTPUT_LOG=Failed to output message log
+OLDLOG_TOO_LARGE=Message log file exceeds the file size limit
+PARTICIPANT_FILE_ERROR=Participant file output error
+
+# Posting / validation
+POSTING_SUSPENDED=The posting function of this bulletin board is currently suspended.
+ADMIN_ONLY_POSTING=Only administrators are allowed to post to the bulletin board.
+ADMIN_POST_DISABLED=Admin access via post form is disabled. Please use the Manage link.
+BAD_REFERER=Posts cannot be made from any URLs besides
+POST_TOO_WIDE=There are too many characters in the post contents.
+POST_TOO_MANY_LINES=There are too many line breaks in the post contents.
+POST_TOO_LARGE=The post contents are too large.
+NAME_TOO_LONG=There are too many characters in the name field. (Up to %s characters)
+EMAIL_TOO_LONG=There are too many characters in the email field. (Up to %s characters)
+TITLE_TOO_LONG=There are too many characters in the title field. (Up to %s characters)
+POST_TOO_FAST=The time between posts is too short. Please try again.
+NGWORD_FOUND=The post contains prohibited words.
+SPAM_KUN=SPAM-KUN GTFO!!!
+
+# Caller / request
+INVALID_CALLER=Invalid caller.
+NO_PARAMETERS=There are no parameters.
+INVALID_PASSWORD=The password is incorrect.
+
+# Follow / search / reference
+MESSAGE_NOT_FOUND=The specified message could not be found.
+REFERENCE_NOT_FOUND=Reference post not found.
+REFERENCE_COLON=Reference:
+FOLLOW_UP_POST=Follow-up post
+POST_SEARCH=Post search
+
+# Completion / undo
+POST_COMPLETE=Post complete
+DELETION_COMPLETE=Deletion complete
+UNDO_POST_NOT_FOUND=The corresponding post was not found.
+UNDO_NOT_PERMITTED=The deletion of the corresponding post is not permitted.
+
+# Main list footer
+POSTS_RANGE_NEWEST_TO_OLDEST=Shown above are posts {BINDEX} through {EINDEX}, in order of newest to oldest. 
+NO_UNREAD_MESSAGES=There are no unread messages. 
+NO_POSTS_BELOW=There are no posts below this point.
+
+# New post page
+NEW_POST=New post
+
+# Labels / tags inserted into messages
+HACKER_TAG= (hacker)
+FRAUDSTER_TAG= (fraudster)
+SELF_REPLY_TAG= (self-reply)
+
+# Weekdays
+SUNDAY=Sun
+MONDAY=Mon
+TUESDAY=Tue
+WEDNESDAY=Wed
+THURSDAY=Thu
+FRIDAY=Fri
+SATURDAY=Sat
+
+# Admin / image upload errors (added 2026-07-16: externalized from
+# sub/{ja,en}/bbsadmin.php, bbsimage.php, bbslog.php -- these previously
+# hardcoded the same message independently in each language file)
+NO_PASSWORD_SET=No password has been set.
+FILE_SIZE_OVER_LIMIT=The file size is over %sKB.
+FILE_UPLOAD_FAILED=File upload process failed. Code: %s
+FAILED_TO_LOAD_UPLOAD_ID=Failed to load the uploaded image file.
+IMAGE_WIDTH_EXCEEDED=The width of the image exceeds the limit.
+INVALID_FILE_FORMAT=The file format is incorrect.
+DIRECTORY_OPEN_FAILED=This directory could not be opened.
+TOO_MANY_KEYWORDS=There are too many search keywords.
+
+# Page titles (added 2026-07-16: externalized during sub/ja+sub/en merge --
+# these were previously hardcoded independently per language, and were at
+# risk of being lost entirely for non-English locales once the folders
+# were unified)
+TITLE_ADMIN_MENU=Administration menu
+TITLE_MESSAGE_DELETE_MODE=Message deletion mode
+TITLE_PASSWORD_SETTINGS=Password settings page
+TITLE_OLDLOG_SEARCH=Message log search
+TITLE_OLDLOG_SEARCH_RESULTS=Message log search results
+TITLE_OLDLOG=Message log
+TITLE_TOPIC_LIST=Topic list
+TITLE_OLDLOG_ARCHIVE=Message log archive
+TITLE_TREEVIEW_MAIN=Tree view
+TITLE_ERROR=Error
+TITLE_NOTICE=Notice
+
+# HTML titles
+TITLE_FOLLOWUP=Follow-up post (reply)
+TITLE_SEARCH_BY_USER=Search by user
+TITLE_THREAD_VIEW=Thread view
+TITLE_TREE_VIEW=Tree view
+TITLE_DELETE_POST=Delete post
+
+# Additional UI strings
+URL_REDIRECTION=URL redirection
+USER_SETTINGS=User settings
+COUNTER_ERROR=Counter error
+
+# template.html UI strings (added 2026-07-17: template.html was still
+# hardcoding button/label text in English regardless of LANGUAGE_FILE.
+# Externalized so the UI actually follows the language setting.)
+NAV_PR_OFFICE=PR office
+NAV_CONTACT=Contact
+NAV_MESSAGE_LOGS=Message logs
+NAV_MANAGE=Manage
+BRAND_NAME=KuzuhaScriptPHP+
+RETURN=Return
+MSG_USER_LABEL=User:
+MSG_POST_DATE_LABEL=Post date:
+NEXT_PAGE=Next page
+RELOAD=Reload
+UNREAD=Unread
+TITLE_ADMIN_POST=Post as administrator
+FORM_NAME_LABEL=Name
+FORM_EMAIL_LABEL=Email
+FORM_TITLE_LABEL=Title
+POST_RELOAD=Post/Reload
+CLEAR=Clear
+FORM_CONTENTS_LABEL=Contents
+FORM_CONTENTS_HELP_SIMPLE=(Up to %s columns and %s lines. Please insert line breaks where appropriate. HTML/BBCode tags cannot be used.)
+FORM_CONTENTS_HELP_IMAGE=(Up to %s columns and %s lines. Please insert line breaks where appropriate. HTML/BBCode tags cannot be used. <br>            If you write %s in your text, the uploaded image will be inserted into that position.)
+KAOMOJI_SHOW_MORE=Show more kaomoji
+KAOMOJI_INTRO=Showing more Ayashii World-style kaomoji. Also check out <a target="_blank" href="//mattari.heyuri.net/">Mattari AA</a>.
+KAOMOJI_CAT_MATTARI=Mattari / Chill
+KAOMOJI_CAT_DAUSO=Dauso / Sad
+KAOMOJI_CAT_ANGRY=Angry / Evil
+KAOMOJI_CAT_EHHH=Ehhh!?
+KAOMOJI_CAT_GESTURES=Gestures / Waves
+KAOMOJI_CAT_SLEEPY=Sleepy / Other
+KAOMOJI_CAT_DROOLING=Drooling
+KAOMOJI_CAT_SMOKING=Smoking / Tea Drinking
+KAOMOJI_CAT_FUN=Fun / Misc
+IMAGE_UPLOAD_LABEL=Image upload
+IMAGE_UPLOAD_HELP=（JPG/GIF/PNG only. Max width %spx; max height %spx; max file size %sKB.）
+POSTS_DISPLAYED_LABEL=Posts&nbsp;displayed
+AUTO_LINK_URLS_LABEL=Auto-link&nbsp;URLs
+LOG_READING_MODE_LABEL=Log-reading&nbsp;mode
+HIDE_LINK_LINE_LABEL=Hide&nbsp;link&nbsp;line
+SHOW_IMAGES_LABEL=Show&nbsp;images
+COUNTER_TEXT=Page&nbsp;views&nbsp;since&nbsp;%s:&nbsp;%s (bulletproof&nbsp;level:&nbsp;%s)
+MBRCOUNT_TEXT=Current&nbsp;participants:&nbsp;%s&nbsp;users (within&nbsp;%s&nbsp;seconds)
+LOGSAVE_TEXT=Max&nbsp;posts&nbsp;saved:&nbsp;%s&nbsp;posts
+THREAD_LABEL=Thread
+TREE_LABEL=Tree
+DELETE_PREVIOUS_POST=Delete&nbsp;previous&nbsp;post
+LATEST_30_POSTS=Latest 30 posts
+POSTS_FOUND= posts found.
+RETURN_TO_BBS_HELP=Click the link above or press <kbd>Alt</kbd>(+<kbd>Shift</kbd>)+<b><kbd>O</kbd></b> to return to the bulletin board.
+DISPLAY_COLORS_LEGEND=Display colors (hexadecimal)
+TEXT_COLOR_LABEL=Text color
+BACKGROUND_COLOR_LABEL=Background color
+LINK_COLOR_LABEL=Link color
+VISITED_LINK_COLOR_LABEL=Visited link color
+ACTIVE_LINK_COLOR_LABEL=Active link color
+MOUSEOVER_LINK_COLOR_LABEL=Mouseover link color
+TITLE_COLOR_LABEL=Title color
+QUOTE_COLOR_LABEL=Quote color
+ADDITIONAL_FEATURES_LEGEND=Additional features
+GZIP_LABEL=Transfer using gzip compression (display will be faster)
+LOG_READING_MODE_DESC_LABEL=Log-reading mode (will not display the post form)
+AUTO_LINK_URLS_DESC_LABEL=Auto-link URLs (URLs inside post contents will automatically become links when posted)
+COOKIE_LABEL=Save your name and email address in a cookie when posting
+HIDE_LINK_ROW_DESC_LABEL=Hide link row (will not display the list of links below the post form)
+FOLLOW_DISPLAY_LEGEND=How to display the follow-up post page
+FOLLOW_NEW_WINDOW_LABEL=Open and display a new window
+FOLLOW_SAME_PAGE_LABEL=Display on the same page
+BOOKMARK_HELP=If you bookmark the URL that appears after you click "Register", you will be able to browse the bulletin board with the above settings.
+REGISTER=Register
+UNDO_CHANGES=Undo changes
+RESTORE_DEFAULTS=Restore defaults
+REDIRECTING=Redirecting…
+PAGE_GEN_TIME_TEXT=Page generation time: %s seconds
+OG_LOCALE=en_US
+
+# tmpltree.html UI strings (added 2026-07-17)
+STANDARD_VIEW=Standard&nbsp;view
+TOP_LABEL=Top
+
+# login.html UI strings (added 2026-07-17)
+MOD_LOGIN_TITLE=Mod login
+PASSWORD_LABEL=Password:
+LOGIN_BUTTON=Login
+LOGIN_ERROR=Invalid username or password.
+
+# tmpladmin.html UI strings (added 2026-07-17)
+DELETE_MESSAGES_BTN=Delete messages
+VIEW_LOG_FILE_BTN=View log file
+REGEN_PASSWORD_BTN=Regenerate encrypted password
+PHP_CONFIG_INFO_BTN=Server PHP configuration information
+LOGOUT_BTN=Logout
+CLOSE_BTN=Close
+PERFORM_DELETION_BTN=Perform deletion
+DELETE_INSTRUCTIONS=Please check the checkboxes of the posts you wish to delete, then click the [Perform deletion] button at the bottom.
+DELETE_COL_HEADER=Delete
+VIEW_COL_HEADER=View
+DATE_POSTED_COL_HEADER=Date Posted
+SUBJECT_COL_HEADER=Subject
+USERNAME_COL_HEADER=Username
+HOST_COL_HEADER=Host
+COMMENT_COL_HEADER=Comment
+SETPASS_INSTRUCTIONS=Set your password.<br>		Please enter the administrator password that you will use to administer the bulletin board from now on.<br>	The password you enter here will be used for posting with the administrator's name, and for authenticating you when entering admin mode.
+ADMIN_PASSWORD_LABEL=Admin password
+SET_BTN=Set
+RESET_BTN=Reset
+PASSWORD_GENERATED_MSG=Encrypted password generated!<br>	Paste the following encrypted password string into the designated section of the main bulletin board script.
+BULLETIN_BOARD_LABEL=Bulletin board
+WARNING_LABEL=WARNING
+ADMIN_ACCESS_WARNING=ACCESS BY UNAUTHORIZED PERSONNEL IS STRICTLY PROHIBITED. PERPETRATORS WILL BE TRACKED, LOCATED, AND DETAINED.
+
+# tmpllog.html UI strings (added 2026-07-17)
+FROM_DAY_LABEL=From day
+HOUR_LABEL=hour
+TO_DAY_LABEL=to day
+MINUTE_LABEL=minutes
+ZIP_ARCHIVES_LINK=ZIP archives of message logs
+LIST_OF_LOGS_HEADING=List of message logs
+DOWNLOAD_LABEL=Download
+SELECT_DESELECT_ALL_LABEL=Select/deselect all
+JS_UNAVAILABLE_WARNING=JavaScript is not available.
+JS_UNAVAILABLE_HELP=Please enable JavaScript to use select/deselect all.
+SEARCH_LOGS_HEADING=Search message logs
+SPECIFY_KEYWORDS_LEGEND=Specify keywords
+SEARCH_BTN=Search
+SPECIFY_TIME_RANGE_LEGEND=Specify time range
+BOOLEAN_OPERATOR_LEGEND=Boolean operator
+AND_SEARCH_OPTION=AND search
+OR_SEARCH_OPTION=OR search
+SEARCH_TARGET_LEGEND=Search target
+ALL_TEXT_OPTION=All text
+USERNAMES_OPTION=Usernames
+TITLES_OPTION=Titles
+OTHER_LEGEND=Other
+CASE_INSENSITIVE_LABEL=Search both uppercase and lowercase
+SHOW_POST_BUTTONS_LABEL=Show post buttons
+GZIP_SIMPLE_LABEL=Transfer using gzip compression
+UNABLE_TO_OPEN_FILE_TEXT=Unable to open %s.
+TOPIC_LIST_COLUMN_HEADERS=Thread view - Tree view - Replies - Last updated - Contents
+ZIP_ARCHIVES_HEADING=Message log ZIP archives
+ZIP_ARCHIVE_COLUMN_HEADERS=Download - Date - Time - Size
+
+# JavaScript UI strings, exposed via window.KSPHP_LANG (added 2026-07-17)
+MAKE_LINE_BREAKS_BTN=Make line breaks
+UPLOADER_THUMBNAILS_LABEL=Uploader thumbnails
+LINK_THUMBNAILS_LABEL=Link thumbnails
+LINK_THUMBNAIL_EXTENSIONS_LEGEND=Link thumbnail extensions
+NGWORD_LINK_START=Filtered words&nbsp;(
+NGWORD_LINK_HITS=&nbsp;hits)
+NGWORD_UPDATE_BTN=Update
+ADMIN_FILTER_BY_LABEL=Filtering by 
+ADMIN_FILTER_HOST_LABEL=host
+ADMIN_FILTER_NAME_LABEL=name
+ADMIN_FILTER_CLEAR_BTN=clear ✕
+ADMIN_RANGE_START_MSG=range start set — click another Date cell to finish
+
+# sub/bbstree.php UI strings (added 2026-07-18, fix for untranslated hardcoded text)
+TREE_RANGE_TEXT=Shown above are threads {BINDEX} through {EINDEX}, displayed in order of most recently updated to least recently updated.
+TREE_NO_THREADS_BELOW=There are no threads below this point.
+TREE_DATE_UPDATED=[Date updated: %s]
+TREE_USER_LABEL=User: 
+
+# sub/bbslog.php search result summary (added 2026-07-18, fix for untranslated hardcoded text)
+SEARCH_RESULT_FOR_QUERY=For "%s" there were 
+SEARCH_RESULTS_COUNT=%d results found.
+SEARCH_NO_RESULTS=no results found.
+
+# sub/bbsimage.php error messages (added 2026-07-18, fix for untranslated hardcoded text)
+UPLOAD_DISABLED_ERROR=Error: The file upload feature is not allowed.
+IMAGE_PROCESSING_UNSUPPORTED_ERROR=Error: The image processing feature is not supported.
+
+# title attribute tooltips across sub/template.html, sub/tmpltree.html
+# (added 2026-07-18, fix for untranslated hardcoded text)
+TITLE_ADMIN_LOGIN=Admin/Mod login
+TITLE_SETTINGS_SHORTCUT=Alt(+Shift)+C, Enter the settings page
+TITLE_POST_RELOAD_SHORTCUT_P=Alt(+Shift)+P, if you click the post button without writing any contents, the page will reload instead
+TITLE_POST_RELOAD_SHORTCUT_R=Alt(+Shift)+R, if you click the post button without writing any contents, the page will reload instead
+TITLE_BOTTOM=Bottom
+TITLE_BOTTOM_SHORTCUT=Bottom Alt(+Shift)+B
+TITLE_BROWSE_OLD_POSTS=Browse and search through old posts.
+TITLE_DELETE_CHANGES_RETURN=Delete all changes and return to the bulletin board.
+TITLE_DELETE_LAST_POST=Delete the last post you made
+TITLE_STACK_BBS_DISPLAY=Display posts in the form of a stack-type bulletin board.
+TITLE_DISPLAY_REPLY_THREAD=Display the reply chain as a thread
+TITLE_DISPLAY_AS_TREE=Display the thread as a tree
+TITLE_DISPLAY_THREADS_BRANCHES=Display threads as branches
+TITLE_EMAIL_ADMIN=Email the administrator
+TITLE_GO_TO_PR_OFFICE=Go to PR office
+TITLE_TO_PR_OFFICE=To the PR office
+TITLE_PR_OFFICE=PR office
+TITLE_LIST_USER_POSTS=List all posts made by the same user
+TITLE_POST_REPLY=Post a reply
+TITLE_RETURN_PREV_PAGE=Return to previous page
+TITLE_RETURN_PREV_PAGE2=Return to the previous page
+TITLE_RETURN_BBS_SHORTCUT=Return to the bulletin board Alt(+Shift)+O
+TITLE_SAVE_SETTINGS_RETURN=Save your settings and return to the bulletin board.
+TITLE_RESET_SETTINGS=Reset your settings
+TITLE_TOP_SHORTCUT=Top Alt(+Shift)+T
+
+# Gikoneko Together (gikoneko.php / gikonekoadd.php)
+GIKO_TOGETHER=Gikoneko Together
+GIKO_TEACH_LINK_TEXT=Teach Gikoneko a word
+GIKO_FORTUNE_SHOKICHI=Small Blessing
+GIKO_FORTUNE_CHUKICHI=Middle Blessing
+GIKO_FORTUNE_KYOU=Curse
+GIKO_FORTUNE_DAIKICHI=Great Blessing
+GIKO_FORTUNE_YOUKICHI=Young Blessing
+GIKO_FORTUNE_GOUKICHI=Thundering Blessing
+GIKO_FORTUNE_NEKOKICHI=Cat Blessing
+GIKO_FORTUNE_DOKICHI=Furious Blessing
+GIKO_FORTUNE_AIKICHI=Loving Blessing
+GIKO_FORTUNE_INKICHI=Retreating Blessing
+GIKO_FORTUNE_KICHI=Blessing
+GIKO_FORTUNE_RAKUKICHI=Carefree Blessing
+GIKO_ADD_TITLE=Gikoneko Together - Posting Screen
+GIKO_ERR_DUPLICATE=This has already been registered.
+GIKO_ERR_TOO_LONG=That word is too long.
+GIKO_ERR_WRITE_FAILED=Failed to write. Check the location and write permissions of the data file (%s).
+GIKO_POST_COMPLETE=Post complete
+GIKO_BACK_TO_BBS=Return to the bulletin board
+GIKO_ADD_PROMPT=Write something for Gikoneko to say (up to %s half-width characters)
+GIKO_ADD_SUBMIT=Teach a word
+GIKO_ADD_RESET=Clear

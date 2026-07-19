@@ -1,0 +1,337 @@
+# ksphp-plus 言語ファイル
+# 書式：KEY=値　（「=」の前後にスペースを入れないこと。「=」より後ろは
+# 行末までそのまま値として扱われるため、先頭・末尾の空白も含めて
+# そのまま反映される）
+# 「#」または「;」で始まる行はコメント。空行は無視される。
+# 文字コード：UTF-8（BOM無し）
+# {MAXNAMELENGTH}のようなプレースホルダはスクリプト側で置換されるため、
+# 綴り（波括弧含む）をそのまま残すこと。
+
+# サービス / アクセス関連
+BBS_OUT_OF_SERVICE=この掲示板は現在停止中です。
+ACCESS_PROHIBITED=アクセスが禁止されています。
+
+# 汎用 / 入出力エラー
+FAILED_TO_READ_MESSAGE=メッセージ読み込みに失敗しました
+FILE_AUTOCREATED=%sが見つからなかったため、新規に作成しました。
+FAILED_TO_OPEN_LOG=%sを開けませんでした。
+FAILED_TO_OUTPUT_LOG=過去ログ出力に失敗しました
+OLDLOG_TOO_LARGE=過去ログファイルがサイズ制限を超えています
+PARTICIPANT_FILE_ERROR=参加者ファイル出力エラー
+
+# 投稿 / 入力チェック
+POSTING_SUSPENDED=この掲示板は現在投稿機能停止中です。
+ADMIN_ONLY_POSTING=掲示板への投稿は管理者のみ許可されています。
+ADMIN_POST_DISABLED=投稿フォームからの管理者アクセスは無効です。「管理画面」リンクを使用してください。
+BAD_REFERER=投稿画面のＵＲＬが <br>{REFCHECKURL}<br>以外からの投稿はできません。
+POST_TOO_WIDE=投稿内容の桁数が大きすぎます。
+POST_TOO_MANY_LINES=投稿内容の行数が大きすぎます。
+POST_TOO_LARGE=投稿内容が大きすぎます。
+NAME_TOO_LONG=投稿者の文字数が多すぎます。（%s文字まで）
+EMAIL_TOO_LONG=メールの文字数が多すぎます。（%s文字まで）
+TITLE_TOO_LONG=題名の文字数が多すぎます。（%s文字まで）
+POST_TOO_FAST=投稿間隔が短すぎます。もう一度やり直して下さい。
+NGWORD_FOUND=投稿禁止語句が含まれています。
+SPAM_KUN=スパムのせいでメール欄が空白ではないと否定されます
+
+# 呼び出し元 / リクエスト関連
+INVALID_CALLER=呼び出し元が不正です。
+NO_PARAMETERS=パラメータがありません。
+INVALID_PASSWORD=パスワードが違います。
+
+# フォロー / 検索 / 参照
+MESSAGE_NOT_FOUND=指定されたメッセージが見つかりません。
+REFERENCE_NOT_FOUND=参照記事が見つかりません。
+REFERENCE_COLON=参考：
+FOLLOW_UP_POST=フォロー投稿
+POST_SEARCH=投稿検索
+
+# 完了 / 取り消し
+POST_COMPLETE=書き込み完了
+DELETION_COMPLETE=消去完了
+UNDO_POST_NOT_FOUND=該当記事は見つかりませんでした。
+UNDO_NOT_PERMITTED=該当記事の消去は許可されていません。
+
+# メイン一覧のフッターメッセージ
+POSTS_RANGE_NEWEST_TO_OLDEST=以上は、現在登録されている新着順{BINDEX}番目から{EINDEX}番目までの記事です。 
+NO_UNREAD_MESSAGES=未読メッセージはありません。
+NO_POSTS_BELOW=これ以下の記事はありません。
+
+# 新規投稿ページ
+NEW_POST=新規投稿
+
+# 名前に挿入されるタグ
+HACKER_TAG=（ハカー）
+FRAUDSTER_TAG=（騙り）
+SELF_REPLY_TAG=（自己レス）
+
+# 曜日（フル表記）
+SUNDAY=日
+MONDAY=月
+TUESDAY=火
+WEDNESDAY=水
+THURSDAY=木
+FRIDAY=金
+SATURDAY=土
+
+# 管理／画像アップロード関連エラー（2026-07-16追加：
+# sub/{ja,en}/bbsadmin.php, bbsimage.php, bbslog.php から外部化。
+# これまで両言語ファイルでそれぞれ独立にハードコードされていた）
+NO_PASSWORD_SET=パスワードが設定されていません。
+FILE_SIZE_OVER_LIMIT=ファイルサイズが%sKBを超えています。
+FILE_UPLOAD_FAILED=ファイルアップロードの処理に失敗しました。コード:%s
+FAILED_TO_LOAD_UPLOAD_ID=アップロード記録ファイルの読み込みに失敗しました
+IMAGE_WIDTH_EXCEEDED=画像の幅が許可量を超えています。
+INVALID_FILE_FORMAT=ファイルの形式が正しくありません。
+DIRECTORY_OPEN_FAILED=ディレクトリが開けませんでした
+TOO_MANY_KEYWORDS=検索キーワードが多すぎます。
+
+# ページタイトル（2026-07-16追加：sub/ja・sub/en統合時に外部化。
+# これまで各言語ファイルに独立でハードコードされており、フォルダ
+# 統合によって日本語版タイトルが失われるところだった）
+TITLE_ADMIN_MENU=管理メニュー
+TITLE_MESSAGE_DELETE_MODE=メッセージ削除モード
+TITLE_PASSWORD_SETTINGS=パスワード設定画面
+TITLE_OLDLOG_SEARCH=過去ログ検索
+TITLE_OLDLOG_SEARCH_RESULTS=過去ログ検索結果
+TITLE_OLDLOG=過去ログ
+TITLE_TOPIC_LIST=トピック一覧
+TITLE_OLDLOG_ARCHIVE=過去ログアーカイブ
+TITLE_TREEVIEW_MAIN=ツリービュー
+TITLE_ERROR=エラー
+TITLE_NOTICE=お知らせ
+
+# HTMLタイトル
+TITLE_FOLLOWUP=フォロー投稿(返信)
+TITLE_SEARCH_BY_USER=投稿者検索
+TITLE_THREAD_VIEW=スレッド表示
+TITLE_TREE_VIEW=ツリー表示
+TITLE_DELETE_POST=投稿を消す
+
+# 追加UI文字列
+URL_REDIRECTION=URLリダイレクト
+USER_SETTINGS=個人用環境設定
+COUNTER_ERROR=カウンターエラー
+
+# template.html のUI文言（2026-07-17追加：template.htmlはLANGUAGE_FILEの
+# 設定に関わらずボタン・ラベル文言が英語のままハードコードされていた。
+# UIが実際に言語設定に従うよう外部化した。）
+NAV_PR_OFFICE=広報室
+NAV_CONTACT=連絡先
+NAV_MESSAGE_LOGS=過去ログ
+NAV_MANAGE=管理画面
+BRAND_NAME=くずはすくりぷとPHP+
+RETURN=戻る
+MSG_USER_LABEL=投稿者：
+MSG_POST_DATE_LABEL=投稿日時：
+NEXT_PAGE=次のページ
+RELOAD=リロード
+UNREAD=未読
+TITLE_ADMIN_POST=管理者投稿
+FORM_NAME_LABEL=投稿者
+FORM_EMAIL_LABEL=メール
+FORM_TITLE_LABEL=題名
+POST_RELOAD=投稿／リロード
+CLEAR=消す
+FORM_CONTENTS_LABEL=内容
+FORM_CONTENTS_HELP_SIMPLE=（%s桁%s行まで。適当に改行を入れてください。タグは使えません。）
+FORM_CONTENTS_HELP_IMAGE=（%s桁%s行まで。適当に改行を入れてください。タグは使えません。<br>            本文中に %s と書くとアップロード画像はその部分に挿入されます。）
+KAOMOJI_SHOW_MORE=もっと表示
+KAOMOJI_INTRO=追加のあやしいわーるど系顔文字を表示中。<a target="_blank" href="//mattari.heyuri.net/">まったりAA</a> もチェックしてね。
+KAOMOJI_CAT_MATTARI=まったり / 落ち着き
+KAOMOJI_CAT_DAUSO=だうそ / 悲しい
+KAOMOJI_CAT_ANGRY=怒り / ワルい顔
+KAOMOJI_CAT_EHHH=えっ！？ / 驚き
+KAOMOJI_CAT_GESTURES=ジェスチャー / 手ふり
+KAOMOJI_CAT_SLEEPY=ねむい / その他
+KAOMOJI_CAT_DROOLING=よだれ
+KAOMOJI_CAT_SMOKING=喫煙 / お茶
+KAOMOJI_CAT_FUN=楽しい / 雑多
+IMAGE_UPLOAD_LABEL=画像アップロード
+IMAGE_UPLOAD_HELP=（jpg/gif/pngのみ。横幅%spixel、縦幅%spixel、サイズ%sKBまで。）
+POSTS_DISPLAYED_LABEL=表示件数
+AUTO_LINK_URLS_LABEL=URL自動リンク
+LOG_READING_MODE_LABEL=ログ読みモード
+HIDE_LINK_LINE_LABEL=リンク行OFF
+SHOW_IMAGES_LABEL=画像ON
+COUNTER_TEXT=%s&nbsp;から&nbsp;%s&nbsp;(こわれにくさレベル : %s)
+MBRCOUNT_TEXT=現在の参加者&nbsp;:&nbsp;%s人&nbsp;(%s秒以内)
+LOGSAVE_TEXT=最大記事件数&nbsp;:&nbsp;%s件
+THREAD_LABEL=スレッド
+TREE_LABEL=ツリー
+DELETE_PREVIOUS_POST=直前の投稿を消す
+LATEST_30_POSTS=最新30件
+POSTS_FOUND=件見つかりました。
+RETURN_TO_BBS_HELP=リンクをクリックするか、<kbd>Alt</kbd>(+<kbd>Shift</kbd>)+<b><kbd>O</kbd></b>で掲示板に戻ります。
+DISPLAY_COLORS_LEGEND=表示色 (16進数)
+TEXT_COLOR_LABEL=文字色
+BACKGROUND_COLOR_LABEL=背景色
+LINK_COLOR_LABEL=リンク色
+VISITED_LINK_COLOR_LABEL=訪問済リンク色
+ACTIVE_LINK_COLOR_LABEL=選択リンク色
+MOUSEOVER_LINK_COLOR_LABEL=マウスオーバーリンク色
+TITLE_COLOR_LABEL=題名色
+QUOTE_COLOR_LABEL=引用色
+ADDITIONAL_FEATURES_LEGEND=付加機能
+GZIP_LABEL=gzip圧縮転送 （表示が高速化されます）
+LOG_READING_MODE_DESC_LABEL=ログ読みモード （投稿フォームを表示しない）
+AUTO_LINK_URLS_DESC_LABEL=URL自動リンク （投稿時に内容内のURLを自動的にリンクにする）
+COOKIE_LABEL=投稿時にCookieに投稿者名とメールアドレスを記録する
+HIDE_LINK_ROW_DESC_LABEL=リンク行OFF （投稿フォーム下のリンク一覧行を表示しない）
+FOLLOW_DISPLAY_LEGEND=フォロー画面の表示方法
+FOLLOW_NEW_WINDOW_LABEL=新規ウィンドウをオープンして表示
+FOLLOW_SAME_PAGE_LABEL=同一画面に表示
+BOOKMARK_HELP=「登録」を押した後に表示されるURLをブックマークに登録すると、上記の設定で掲示板を閲覧できます。
+REGISTER=登録
+UNDO_CHANGES=元に戻す
+RESTORE_DEFAULTS=初期設定に戻す
+REDIRECTING=転送中…
+PAGE_GEN_TIME_TEXT=実行時間 : %s秒
+OG_LOCALE=ja_JP
+
+# tmpltree.html のUI文言（2026-07-17追加）
+STANDARD_VIEW=標準画面
+TOP_LABEL=上
+
+# login.html のUI文言（2026-07-17追加）
+MOD_LOGIN_TITLE=管理者ログイン
+PASSWORD_LABEL=パスワード：
+LOGIN_BUTTON=入室
+LOGIN_ERROR=ユーザー名またはパスワードが違います。
+
+# tmpladmin.html のUI文言（2026-07-17追加）
+DELETE_MESSAGES_BTN=メッセージ削除
+VIEW_LOG_FILE_BTN=ログファイル閲覧
+REGEN_PASSWORD_BTN=暗号化パスワード再生成
+PHP_CONFIG_INFO_BTN=サーバーのPHP設定情報
+LOGOUT_BTN=ログアウト
+CLOSE_BTN=終了
+PERFORM_DELETION_BTN=削除実行
+DELETE_INSTRUCTIONS=削除したい投稿をチェックして、下にある[削除実行]ボタンを押してください。
+DELETE_COL_HEADER=削除
+VIEW_COL_HEADER=表示
+DATE_POSTED_COL_HEADER=投稿日
+SUBJECT_COL_HEADER=題名
+USERNAME_COL_HEADER=投稿者
+HOST_COL_HEADER=ホスト
+COMMENT_COL_HEADER=内容
+SETPASS_INSTRUCTIONS=パスワード設定を行います。<br>		これから掲示板の管理で使用する「管理用パスワード」を入力してください。<br>	ここで入力するパスワードは、管理人名での投稿、管理モードの認証の際に使用します。
+ADMIN_PASSWORD_LABEL=管理用パスワード
+SET_BTN=設定
+RESET_BTN=リセット
+PASSWORD_GENERATED_MSG=暗号化パスワードを生成しました！<br>	掲示板スクリプト本体の所定の位置に、下記の暗号化パスワード文字列を貼り付けて下さい。
+BULLETIN_BOARD_LABEL=掲示板
+WARNING_LABEL=警告
+ADMIN_ACCESS_WARNING=管理メニューへの許可無きアクセスは固く禁止されています。違反者は追跡、特定、拘留されます。
+
+# tmpllog.html のUI文言（2026-07-17追加）
+FROM_DAY_LABEL=開始日
+HOUR_LABEL=時
+TO_DAY_LABEL=終了日
+MINUTE_LABEL=分
+ZIP_ARCHIVES_LINK=過去ログZIPアーカイブ
+LIST_OF_LOGS_HEADING=過去ログ一覧
+DOWNLOAD_LABEL=ダウンロード
+SELECT_DESELECT_ALL_LABEL=全選択／解除
+JS_UNAVAILABLE_WARNING=JavaScriptが利用できません。
+JS_UNAVAILABLE_HELP=全選択／解除を利用するにはJavaScriptを有効にしてください。
+SEARCH_LOGS_HEADING=過去ログ検索
+SPECIFY_KEYWORDS_LEGEND=キーワード指定
+SEARCH_BTN=検索
+SPECIFY_TIME_RANGE_LEGEND=時刻指定
+BOOLEAN_OPERATOR_LEGEND=論理式
+AND_SEARCH_OPTION=AND検索
+OR_SEARCH_OPTION=OR検索
+SEARCH_TARGET_LEGEND=検索対象
+ALL_TEXT_OPTION=全文
+USERNAMES_OPTION=投稿者名
+TITLES_OPTION=題名
+OTHER_LEGEND=その他
+CASE_INSENSITIVE_LABEL=大文字小文字同一視
+SHOW_POST_BUTTONS_LABEL=引用機能使用
+GZIP_SIMPLE_LABEL=gzip圧縮転送
+UNABLE_TO_OPEN_FILE_TEXT=%s を開けませんでした。
+TOPIC_LIST_COLUMN_HEADERS=スレッド表示 - ツリー表示 - 件数 - 最終更新日時 - 内容
+ZIP_ARCHIVES_HEADING=過去ログZIPアーカイブ
+ZIP_ARCHIVE_COLUMN_HEADERS=ダウソ - 日付 - 時刻 - サイズ
+
+# JavaScript UI文言、window.KSPHP_LANG経由で参照（2026-07-17追加）
+MAKE_LINE_BREAKS_BTN=改行を入れる
+UPLOADER_THUMBNAILS_LABEL=アップローダーサムネイル
+LINK_THUMBNAILS_LABEL=サムネイル表示
+LINK_THUMBNAIL_EXTENSIONS_LEGEND=サムネイル対象拡張子
+NGWORD_LINK_START=NG Word(
+NGWORD_LINK_HITS=件hit)
+NGWORD_UPDATE_BTN=更新
+ADMIN_FILTER_BY_LABEL=絞り込み中: 
+ADMIN_FILTER_HOST_LABEL=ホスト
+ADMIN_FILTER_NAME_LABEL=投稿者
+ADMIN_FILTER_CLEAR_BTN=解除 ✕
+ADMIN_RANGE_START_MSG=始点を設定。投稿日をもう一度クリックで範囲選択
+
+# sub/bbstree.php のUI文言（2026-07-18追加、未翻訳ハードコード文字列の修正）
+TREE_RANGE_TEXT=以上は、更新順（新しい順）{BINDEX}番目から{EINDEX}番目までのスレッドです。
+TREE_NO_THREADS_BELOW=これ以下のスレッドはありません。
+TREE_DATE_UPDATED=[更新日時：%s]
+TREE_USER_LABEL=投稿者： 
+
+# sub/bbslog.php 検索結果サマリー（2026-07-18追加、未翻訳ハードコード文字列の修正）
+SEARCH_RESULT_FOR_QUERY=「%s」の検索結果：
+SEARCH_RESULTS_COUNT=%d件見つかりました。
+SEARCH_NO_RESULTS=見つかりませんでした。
+
+# sub/bbsimage.php エラーメッセージ（2026-07-18追加、未翻訳ハードコード文字列の修正）
+UPLOAD_DISABLED_ERROR=エラー：ファイルアップロード機能が許可されていません。
+IMAGE_PROCESSING_UNSUPPORTED_ERROR=エラー：画像処理機能がサポートされていません。
+
+# sub/template.html, sub/tmpltree.html のtitle属性（2026-07-18追加、未翻訳ハードコード文字列の修正）
+TITLE_ADMIN_LOGIN=管理人・モデレーターログイン
+TITLE_SETTINGS_SHORTCUT=Alt(+Shift)+C、設定ページへ
+TITLE_POST_RELOAD_SHORTCUT_P=Alt(+Shift)+P、内容を書かずに投稿ボタンを押すとページが再読み込みされます
+TITLE_POST_RELOAD_SHORTCUT_R=Alt(+Shift)+R、内容を書かずに投稿ボタンを押すとページが再読み込みされます
+TITLE_BOTTOM=下
+TITLE_BOTTOM_SHORTCUT=下 Alt(+Shift)+B
+TITLE_BROWSE_OLD_POSTS=過去の投稿を閲覧・検索します。
+TITLE_DELETE_CHANGES_RETURN=変更をすべて削除して掲示板に戻ります。
+TITLE_DELETE_LAST_POST=自分の最後の投稿を削除します
+TITLE_STACK_BBS_DISPLAY=スタック型掲示板の形式で投稿を表示します。
+TITLE_DISPLAY_REPLY_THREAD=返信の連なりをスレッド形式で表示します
+TITLE_DISPLAY_AS_TREE=スレッドをツリー形式で表示します
+TITLE_DISPLAY_THREADS_BRANCHES=スレッドを枝分かれ形式で表示します
+TITLE_EMAIL_ADMIN=管理人にメールを送ります
+TITLE_GO_TO_PR_OFFICE=広報室へ移動します
+TITLE_TO_PR_OFFICE=広報室へ
+TITLE_PR_OFFICE=広報室
+TITLE_LIST_USER_POSTS=同じ投稿者の書き込みを一覧表示します
+TITLE_POST_REPLY=返信を投稿します
+TITLE_RETURN_PREV_PAGE=前のページに戻ります
+TITLE_RETURN_PREV_PAGE2=前のページに戻ります
+TITLE_RETURN_BBS_SHORTCUT=掲示板に戻ります Alt(+Shift)+O
+TITLE_SAVE_SETTINGS_RETURN=設定を保存して掲示板に戻ります。
+TITLE_RESET_SETTINGS=設定をリセットします
+TITLE_TOP_SHORTCUT=上 Alt(+Shift)+T
+
+# 擬古猫といっしょ（gikoneko.php / gikonekoadd.php）
+GIKO_TOGETHER=擬古猫といっしょ
+GIKO_TEACH_LINK_TEXT=擬古猫にことばを教える
+GIKO_FORTUNE_SHOKICHI=小吉
+GIKO_FORTUNE_CHUKICHI=中吉
+GIKO_FORTUNE_KYOU=凶
+GIKO_FORTUNE_DAIKICHI=大吉
+GIKO_FORTUNE_YOUKICHI=幼吉
+GIKO_FORTUNE_GOUKICHI=轟吉
+GIKO_FORTUNE_NEKOKICHI=猫吉
+GIKO_FORTUNE_DOKICHI=怒吉
+GIKO_FORTUNE_AIKICHI=愛吉
+GIKO_FORTUNE_INKICHI=引吉
+GIKO_FORTUNE_KICHI=吉
+GIKO_FORTUNE_RAKUKICHI=楽吉
+GIKO_ADD_TITLE=擬古猫といっしょ 投稿画面
+GIKO_ERR_DUPLICATE=すでに登録されています。
+GIKO_ERR_TOO_LONG=ことばが長すぎます。
+GIKO_ERR_WRITE_FAILED=書き込みに失敗しました。データファイル（%s）の場所と書き込み権限を確認してください。
+GIKO_POST_COMPLETE=書き込み完了
+GIKO_BACK_TO_BBS=掲示板に戻る
+GIKO_ADD_PROMPT=擬古猫に喋らせたい言葉を書いてください（半角%s文字まで）
+GIKO_ADD_SUBMIT=ことばを教える
+GIKO_ADD_RESET=消す
