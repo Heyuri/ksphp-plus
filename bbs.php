@@ -19,12 +19,6 @@ The instructions have been moved to readme.md.
 // Configuration file
 require_once("./conf.php");
 
-// Migration Engine: on first run only, auto-migrates legacy root-level
-// data/log files into data/ and logs/. No-op (single file_exists() check)
-// on every request after that. See doc/migration-engine-spec-2026-07-19-01.txt.
-require_once("./migrate.php");
-ksphp_migrate();
-
 // Version (for copyright notice)
 $CONF['VERSION'] = '[20260719] (<span title="Heyuri Applicable Research & Development">Heyuri</span>, <span title="Hiru-ga-take">ヶ</span>, ＠Links, <span title="Giko-neko">擬古猫</span>)';
 
