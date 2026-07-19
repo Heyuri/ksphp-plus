@@ -6,26 +6,24 @@
   const table = document.querySelector('table.postlists');
   if (!table || !table.querySelector(CHECKBOX_SEL)) return;
   const tbody = table.querySelector('tbody') || table;
-  const thead = table.querySelector('thead');
 
   /* ---------- constants ---------- */
   const HIDDEN = 'swdh-hidden';
   const ARMED  = 'swdh-armed';
 
   /* ---------- language of the board ----------
-     The EN board is also tagged <html lang="ja">, and navigator.language is the
-     browser locale rather than the board's, so detect from the header labels. */
-  const isJapanese = /ホスト|投稿者|投稿日/.test(thead ? thead.textContent : '');
-  const T = isJapanese ? {
-    filtering: '絞り込み中: ',
-    host: 'ホスト', name: '投稿者',
-    clear: '解除 ✕',
-    armed: '始点を設定。投稿日をもう一度クリックで範囲選択',
-  } : {
-    filtering: 'Filtering by ',
-    host: 'host', name: 'name',
-    clear: 'clear ✕',
-    armed: 'range start set — click another Date cell to finish',
+     2026-07-17: Previously this guessed the language by sniffing Japanese
+     characters out of the rendered header text, since navigator.language is
+     the browser's locale rather than the board's. window.KSPHP_LANG now
+     reflects the board's actual LANGUAGE_FILE setting directly, so use
+     that instead -- also removes the ja/en-only limitation. */
+  const LANG = window.KSPHP_LANG || {};
+  const T = {
+    filtering: LANG.ADMIN_FILTER_BY_LABEL || 'Filtering by ',
+    host: LANG.ADMIN_FILTER_HOST_LABEL || 'host',
+    name: LANG.ADMIN_FILTER_NAME_LABEL || 'name',
+    clear: LANG.ADMIN_FILTER_CLEAR_BTN || 'clear \u2715',
+    armed: LANG.ADMIN_RANGE_START_MSG || 'range start set \u2014 click another Date cell to finish',
   };
 
   /* ---------- styles ---------- */
@@ -50,14 +48,15 @@
   const COL = (function () {
     const ths = Array.from(table.querySelectorAll('thead th'));
     const find = (labels, fallback) => {
+      const validLabels = labels.filter(Boolean);
       const i = ths.findIndex(th =>
-        labels.some(l => th.textContent.trim().toLowerCase() === l.toLowerCase()));
+        validLabels.some(l => th.textContent.trim().toLowerCase() === l.toLowerCase()));
       return i >= 0 ? i : fallback;
     };
     return {
-      date: find(['Date Posted', '投稿日'], 2),
-      name: find(['Username', '投稿者'], 4),
-      host: find(['Host', 'ホスト'], 5),
+      date: find([LANG.DATE_POSTED_COL_HEADER, 'Date Posted', '投稿日'], 2),
+      name: find([LANG.USERNAME_COL_HEADER, 'Username', '投稿者'], 4),
+      host: find([LANG.HOST_COL_HEADER, 'Host', 'ホスト'], 5),
     };
   })();
 

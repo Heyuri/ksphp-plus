@@ -1,6 +1,11 @@
 /* Thanks Anonymous-san from Strange World@Heyuri.net! */
-/* Ayashii Breaker v0.3.1 */
+/* Ayashii Breaker v0.4.0 */
 /* Adds a button to instantly add line breaks to your post! */
+/* v0.4.0: Added Japanese kinsoku shori (禁則処理) line breaking.
+   Lines containing Japanese characters are broken by character count
+   with kinsoku rules applied; other lines keep the original
+   space-delimited word-wrap behavior. Multilingual: detection is
+   per-line, so mixed-language posts are handled automatically. */
 /*
                                        あやしいブレイク工業
  
@@ -46,6 +51,47 @@ Have you ever seen mighty skills to treat pile heads, rough clenched fists to su
 (function() {
 	'use strict';
 
+	// 行頭禁則: characters that must not start a line (get pulled back
+	// onto the tail of the previous line instead).
+	const KINSOKU_LEADING = "、。，．,.）」』】〕〉》」〙〗〟)]｝》〕、。！？!?ぁぃぅぇぉっゃゅょゎァィゥェォッャュョヮーゝゞ・：；:;";
+	// 行末禁則: characters that must not end a line (get pushed onto
+	// the head of the next line instead).
+	const KINSOKU_TRAILING = "（「『【〔〈《〘〖〝([｛《〔";
+
+	function isJapanese(text) {
+		return /[\u3040-\u30ff\u3400-\u9fff\uff00-\uffef]/.test(text);
+	}
+
+	// Character-based line breaking with kinsoku shori, used for
+	// lines that contain Japanese text (no spaces to break on).
+	function breakJapaneseLine(line, maxLength) {
+		const chars = Array.from(line);
+		let rows = [];
+		let current = [];
+		for (const ch of chars) {
+			current.push(ch);
+			if (current.length >= maxLength) {
+				rows.push(current);
+				current = [];
+			}
+		}
+		if (current.length > 0) rows.push(current);
+
+		for (let i = 0; i < rows.length - 1; i++) {
+			// 行頭禁則: pull disallowed leading characters back to
+			// the end of the current row.
+			while (rows[i + 1].length > 0 && KINSOKU_LEADING.includes(rows[i + 1][0])) {
+				rows[i].push(rows[i + 1].shift());
+			}
+			// 行末禁則: push disallowed trailing characters forward
+			// to the start of the next row.
+			while (rows[i].length > 0 && KINSOKU_TRAILING.includes(rows[i][rows[i].length - 1])) {
+				rows[i + 1].unshift(rows[i].pop());
+			}
+		}
+		return rows.filter(r => r.length > 0).map(r => r.join(''));
+	}
+
 	function breaker() {
 		const MAX_LENGTH = 72;
 		let lines = document.getElementById('contents1').value.split('\n');
@@ -53,6 +99,12 @@ Have you ever seen mighty skills to treat pile heads, rough clenched fists to su
 		for (let i in lines) {
 			if (lines[i].charAt(0) == ">") {
 				newlines.push(lines[i]);
+				continue;
+			}
+			if (isJapanese(lines[i])) {
+				for (const row of breakJapaneseLine(lines[i], MAX_LENGTH)) {
+					newlines.push(row);
+				}
 				continue;
 			}
 			let idx = 0;
@@ -86,10 +138,14 @@ function checkLineLengths() {
 		// ignore lines that are not too long
 		if (raw.length <= MAX_LENGTH) continue;
 
-		// if any single word is longer than MAX_LENGTH, breaker can't help -> no alert
-		const words = raw.split(' ').filter(w => w.trim() !== '');
-		// suppress glow ONLY if the entire line is one single long unbreakable word
-		if (words.length === 1 && words[0].length > MAX_LENGTH) continue;
+		// Japanese lines are always breakable per-character, so the
+		// "single unbreakable word" exemption below doesn't apply to them.
+		if (!isJapanese(raw)) {
+			// if any single word is longer than MAX_LENGTH, breaker can't help -> no alert
+			const words = raw.split(' ').filter(w => w.trim() !== '');
+			// suppress glow ONLY if the entire line is one single long unbreakable word
+			if (words.length === 1 && words[0].length > MAX_LENGTH) continue;
+		}
 
 		// otherwise, this is a fixable overlong line -> glow
 		alert = true;
@@ -103,7 +159,8 @@ function checkLineLengths() {
 
 	function addButton() {
 		var element = document.querySelector('[title="Alt(+Shift)+K"]');
-		var newElement = ' <input type="button" id="breakbutt" value="Make line breaks"> '
+		var label = (window.KSPHP_LANG && window.KSPHP_LANG.MAKE_LINE_BREAKS_BTN) || "Make line breaks";
+			var newElement = ' <input type="button" id="breakbutt" value="' + label + '"> '
 		element.insertAdjacentHTML('afterend', newElement);
 		document.getElementById("breakbutt").addEventListener("click", breaker, false);
 		document.getElementById("contents1").addEventListener("input", checkLineLengths, false);

@@ -74,7 +74,7 @@
 
 		const label = document.createElement('label');
 		label.setAttribute('for', 'enableThumbnails');
-		label.textContent = 'Uploader thumbnails';
+		label.textContent = (window.KSPHP_LANG && window.KSPHP_LANG.UPLOADER_THUMBNAILS_LABEL) || 'Uploader thumbnails';
 
 		const checkbox = document.createElement('input');
 		checkbox.type = 'checkbox';

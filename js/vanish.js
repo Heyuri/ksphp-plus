@@ -1,10 +1,20 @@
 "use strict";
 
-const isJapanese = navigator.language.startsWith('ja');
+// 2026-07-17：以前はnavigator.language（ブラウザの言語設定）で判定して
+// いたが、これは掲示板側のLANGUAGE_FILE設定と食い違うことがあった
+// （例：サイトは日本語設定なのに、閲覧者のブラウザは英語、等）。
+// window.KSPHP_LANGはサーバー側の実際の言語設定を反映しているため、
+// そちらを優先的に参照するよう変更。
+// 2026-07-17: This used to detect via navigator.language (the browser's
+// own language setting), which could mismatch the board's actual
+// LANGUAGE_FILE setting (e.g. site set to Japanese but the visitor's
+// browser is in English). window.KSPHP_LANG reflects the server's
+// actual active language, so prefer that when available.
+const LANG = window.KSPHP_LANG || {};
 
-const TEXT_LINK_START = isJapanese ? 'NG Word(' : 'Filtered words&nbsp;(';
-const TEXT_LINK_HITS  = isJapanese ? '件hit)' : '&nbsp;hits)';
-const TEXT_UPDATE     = isJapanese ? '更新' : 'Update';
+const TEXT_LINK_START = LANG.NGWORD_LINK_START || 'Filtered words&nbsp;(';
+const TEXT_LINK_HITS  = LANG.NGWORD_LINK_HITS || '&nbsp;hits)';
+const TEXT_UPDATE     = LANG.NGWORD_UPDATE_BTN || 'Update';
 
 function contains(array, elm) {
     for (var i = 0; i < array.length; i++) {
