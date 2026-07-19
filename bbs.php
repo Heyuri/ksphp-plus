@@ -19,23 +19,93 @@ The instructions have been moved to readme.md.
 // Configuration file
 require_once("./conf.php");
 
+// Migration Engine: on first run only, auto-migrates legacy root-level
+// data/log files into data/ and logs/. No-op (single file_exists() check)
+// on every request after that. See doc/migration-engine-spec-2026-07-19-01.txt.
+require_once("./migrate.php");
+ksphp_migrate();
+
 // Version (for copyright notice)
-$CONF['VERSION'] = '[20260710] (<span title="Heyuri Applicable Research & Development">Heyuri</span>, <span title="Hiru-ga-take">ヶ</span>, ＠Links, <span title="Giko-neko">擬古猫</span>)';
+$CONF['VERSION'] = '[20260719] (<span title="Heyuri Applicable Research & Development">Heyuri</span>, <span title="Hiru-ga-take">ヶ</span>, ＠Links, <span title="Giko-neko">擬古猫</span>)';
+
+// Internal build identifier (matches the distribution zip filename, minus the
+// .zip extension: {name}(-rcN)?-{ISO date}-{NN}). $CONF['VERSION'] above is a
+// display/branding version and does not change on every build; this constant
+// is for precise build-to-build comparison (e.g. future differential-update
+// tooling). Update this value whenever a new package zip is built.
+define('KSPHP_PLUS_BUILD', 'ksphp-plus-main-rc6-2026-07-19-01');
 
 /* Launch */
 
-// Determine language-specific subdirectory
-// eg. TEMPLATE_LANGUAGE = 'en' -> './sub/en/'
-$tmpl_lang = $CONF['TEMPLATE_LANGUAGE'] ?? 'ja';
-$SUBDIR = './sub/' . $tmpl_lang . '/';
+// 2026-07-16：sub/ja・sub/enの重複を解消し、ロジック／テンプレートは
+// sub/ 直下に一本化した。$SUBDIR分岐は廃止。
+// 2026-07-16: Unified the previously-duplicated sub/ja and sub/en trees;
+// logic and templates now live directly under sub/. The old $SUBDIR
+// branching has been removed.
+$SUBDIR = './sub/';
 
-// Load language strings to be used in this file
-$langfile = $SUBDIR . 'lang.php';
+/**
+ * language/*.txt を読み込み、KEY=値 の連想配列に変換する。
+ * - 「#」または「;」で始まる行はコメント
+ * - 空行は無視
+ * - 「=」より前がキー（前後の空白は無視）、より後ろが値（そのまま、
+ *   末尾の空白も含めて保持）
+ * - 文字コードはUTF-8（BOM無し）前提
+ *
+ * Reads a language/*.txt file and converts it to a KEY => value array.
+ * - Lines starting with "#" or ";" are comments
+ * - Blank lines are ignored
+ * - Everything before the first "=" is the key (surrounding whitespace
+ *   trimmed); everything after is the value, taken as-is (including any
+ *   trailing whitespace)
+ * - Assumes UTF-8 encoding without a BOM
+ *
+ * @param   String  $path  言語ファイルのパス / path to the language file
+ * @return  Array   キー => 値 / key => value
+ */
+function loadLanguageFile($path) {
+    $result = array();
+    $lines = @file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    if ($lines === false) {
+        return $result;
+    }
+    foreach ($lines as $line) {
+        $trimmed = ltrim($line);
+        if ($trimmed === '' || $trimmed[0] === '#' || $trimmed[0] === ';') {
+            continue;
+        }
+        $pos = strpos($line, '=');
+        if ($pos === false) {
+            continue;
+        }
+        $key = trim(substr($line, 0, $pos));
+        $result[$key] = substr($line, $pos + 1);
+    }
+    return $result;
+}
+
+// UI文言（$MSG）の読み込み。language/{LANGUAGE_FILE}.txtを読む。
+// 2026-07-16：sub/{ja,en}/lang.phpへのフォールバックは、当該サブ
+// フォルダ自体を廃止したため削除した。LANGUAGE_FILE未設定時は
+// 'english'を既定値として扱う。
+//
+// Loads the UI strings ($MSG) from language/{LANGUAGE_FILE}.txt.
+// 2026-07-16: Removed the fallback to sub/{ja,en}/lang.php, since those
+// subfolders no longer exist. Defaults to 'english' if LANGUAGE_FILE is
+// not set.
+$language_file_name = $CONF['LANGUAGE_FILE'] ?? 'english';
+$langfile = './language/' . $language_file_name . '.txt';
 if (file_exists($langfile)) {
-    require_once $langfile;
+    $MSG = loadLanguageFile($langfile);
 } else {
     die("Language file not found: $langfile");
 }
+// 2026-07-17：JS側（imgthumb.js等）でも$MSGの文言を参照できるよう、
+// JSONにしておく。window.KSPHP_LANGとしてHTMLヘッダーに埋め込む。
+// 2026-07-17: Pre-encode $MSG as JSON so JavaScript files (imgthumb.js
+// etc.) can reference the same translations, exposed as
+// window.KSPHP_LANG in the HTML header.
+$MSG_JSON = json_encode($MSG, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP);
 // Translation helper
 function T($key) {
     return $GLOBALS['MSG'][$key] ?? $key;
@@ -168,7 +238,8 @@ function script_run() {
         $t->readTemplatesFromFile($CONF['TEMPLATE']);
         $t->readTemplatesFromFile($CONF['TEMPLATE_LOGIN']);
 
-        $templateValues = removeArrayValues($CONF);
+        $templateValues = removeArrayValues(array_merge($CONF, $GLOBALS['MSG']));
+        $templateValues['JS_LANG_JSON'] = $GLOBALS['MSG_JSON'];
 
         $t->addGlobalVars($templateValues);
         $t->displayParsedTemplate('login');
@@ -192,10 +263,11 @@ function script_run() {
             $t->readTemplatesFromFile($CONF['TEMPLATE_LOGIN']);
 
             // environment vars for template
-            $templateValues = removeArrayValues($CONF);
+            $templateValues = removeArrayValues(array_merge($CONF, $GLOBALS['MSG']));
+            $templateValues['JS_LANG_JSON'] = $GLOBALS['MSG_JSON'];
 
             $t->addGlobalVars($templateValues);
-            $t->addVar('login', 'LOGIN_ERROR', 'Invalid username or password.');
+            $t->addVar('login', 'LOGIN_ERROR', T('LOGIN_ERROR'));
             $t->setAttribute('login_error', 'visibility', 'visible');
             $t->displayParsedTemplate('login');
             exit();
@@ -334,7 +406,17 @@ class Webapp {
 
 function tripuse($key) {
     #$tripkey = '#istrip';? // String to be used as password (with #)
-            $key = mb_convert_encoding($key, "SJIS-win", "UTF-8,SJIS-win");	// to, from
+            if (function_exists('mb_convert_encoding')) {
+                $key = mb_convert_encoding($key, "SJIS-win", "UTF-8,SJIS-win");	// to, from
+            } else {
+                // mbstringが無効な環境向けのフォールバック（iconv）。
+                // SJIS-winとCP932は一部文字（波ダッシュ等）の扱いが異なるため、
+                // 他サイトのトリップ計算機と結果が完全一致しない可能性はあるが、
+                // mbstring不在による500エラーで投稿自体ができなくなるよりは
+                // 望ましいための代替措置（2026-07-19）。
+                $converted = @iconv('UTF-8', 'CP932//IGNORE', $key);
+                $key = ($converted !== false) ? $converted : $key;
+            }
     #		$key = '#'.substr($key, strpos($key, '#'));
     
     # Trip
@@ -444,9 +526,29 @@ function tripuse($key) {
         # Default URL
         $this->s['DEFURL'] = $this->c['CGIURL'] . '?' . $this->s['QUERY'];
         # Initialize template variables
-        $tmp = array_merge($this->c, $this->s);
+        # 2026-07-17：$MSG（言語ファイル）も統合し、テンプレート側で{KEY}として
+        # 使えるようにする（テンプレート内の固定文言のハードコード対策）。
+        # 2026-07-17: Also merge in $MSG (the language file) so templates can
+        # reference any $MSG key as {KEY} (fixes hardcoded strings in
+        # templates that previously bypassed the language file).
+        $tmp = array_merge($this->c, $this->s, $GLOBALS['MSG']);
 
         $tmp = removeArrayValues($tmp);
+
+        # 2026-07-17：LOGSAVE_TEXT等も同様に、$CONFの値が確定しているこの時点で
+        # sprintf()により先に完成させておく（{}のネスト置換はpatTemplateでは
+        # 機能しないため）。MAX_IMAGE*系はBBSMODE_IMAGE=1の時のみ存在するため
+        # ??で未設定時も安全にフォールバックする。
+        # 2026-07-17: Likewise pre-resolve LOGSAVE_TEXT and friends here via
+        # sprintf(), since $CONF values are already known at this point
+        # (nested {} substitution is not supported by patTemplate). The
+        # MAX_IMAGE* keys only exist when BBSMODE_IMAGE=1, so fall back
+        # safely with ?? when unset.
+        $tmp['LOGSAVE_TEXT'] = sprintf($GLOBALS['MSG']['LOGSAVE_TEXT'], $this->c['LOGSAVE']);
+        $tmp['FORM_CONTENTS_HELP_SIMPLE'] = sprintf($GLOBALS['MSG']['FORM_CONTENTS_HELP_SIMPLE'], $this->c['MAXMSGCOL'], $this->c['MAXMSGLINE']);
+        $tmp['FORM_CONTENTS_HELP_IMAGE'] = sprintf($GLOBALS['MSG']['FORM_CONTENTS_HELP_IMAGE'], $this->c['MAXMSGCOL'], $this->c['MAXMSGLINE'], $this->c['IMAGETEXT'] ?? '');
+        $tmp['IMAGE_UPLOAD_HELP'] = sprintf($GLOBALS['MSG']['IMAGE_UPLOAD_HELP'], $this->c['MAX_IMAGEWIDTH'] ?? '', $this->c['MAX_IMAGEHEIGHT'] ?? '', $this->c['MAX_IMAGESIZE'] ?? '');
+        $tmp['JS_LANG_JSON'] = $GLOBALS['MSG_JSON'];
 
         $this->t->addGlobalVars($tmp);
     }
@@ -459,7 +561,7 @@ function tripuse($key) {
      */
     function prterror($err_message) {
         $this->sethttpheader();
-        print $this->prthtmlhead ($this->c['BBSTITLE'] . ' Error');
+        print $this->prthtmlhead ($this->c['BBSTITLE'] . ' ' . T('TITLE_ERROR'));
         $this->t->addVar('error', 'ERR_MESSAGE', $err_message);
         if (isset($this->s['DEFURL'])) {
             $this->t->setAttribute('backnavi', 'visibility', 'visible');
@@ -503,7 +605,7 @@ function tripuse($key) {
      */
     function prtfilecreated($messages) {
         $this->sethttpheader();
-        print $this->prthtmlhead ($this->c['BBSTITLE'] . ' Notice');
+        print $this->prthtmlhead ($this->c['BBSTITLE'] . ' ' . T('TITLE_NOTICE'));
         $this->t->addVar('error', 'ERR_MESSAGE', implode('<br>', $messages));
         if (!isset($this->s['DEFURL'])) {
             $this->s['DEFURL'] = $this->c['CGIURL'];
@@ -547,6 +649,7 @@ function tripuse($key) {
             $duration = sprintf("%0.6f", $duration);
             $this->t->setAttribute('duration', 'visibility', 'visible');
             $this->t->addVar('duration', 'DURATION', $duration);
+            $this->t->addVar('duration', 'PAGE_GEN_TIME_TEXT', sprintf(T('PAGE_GEN_TIME_TEXT'), $duration));
         }
         $htmlstr = $this->t->getParsedTemplate('footer');
         return $htmlstr;
@@ -588,16 +691,9 @@ function tripuse($key) {
 		$message['MSG'] = preg_replace("/{/i","&#123;", $message['MSG'], -1);
         $message['MSG'] = preg_replace("/}/i","&#125;", $message['MSG'], -1);
 
-	#20241016 Heyuri: Deprecated by ytthumb.js, embedding each video in browser slows stuff down a lot
-        ##20200524 Gikoneko: youtube embedding
-        #$message['MSG'] = preg_replace("/<a href=\"https:\/\/youtu.be\/([^\"]+?)\" target=\"link\">([^<]+?)<\/a>/",
-        #"<iframe width=\"560\" height=\"315\" src=\"https://www.youtube.com/embed/$1\" frameborder=\"0\" allow=\"autoplay; encrypted-media\" allowfullscreen></iframe>\r<a href=\"https://youtu.be/$1\">$2</a>", $message['MSG']);
-        ##20200524 Gikoneko: youtube embedding 2
-        #$message['MSG'] = preg_replace("/<a href=\"https:\/\/www.youtube.com\/watch\?v=([^\"]+?)\" target=\"link\">([^<]+?)<\/a>/",
-        #"<iframe width=\"560\" height=\"315\" src=\"https://www.youtube.com/embed/$1\" frameborder=\"0\" allow=\"autoplay; encrypted-media\" allowfullscreen></iframe>\r<a href=\"https://www.youtube.com/watch?v=$1\">$2</a>", $message['MSG']);
-        ##20200524 Gikoneko: youtube embedding 3
-        #$message['MSG'] = preg_replace("/<a href=\"https:\/\/m.youtube.com\/watch\?v=([^\"]+?)\" target=\"link\">([^<]+?)<\/a>/",
-        #"<iframe width=\"560\" height=\"315\" src=\"https://www.youtube.com/embed/$1\" frameborder=\"0\" allow=\"autoplay; encrypted-media\" allowfullscreen></iframe>\r<a href=\"https://m.youtube.com/watch?v=$1\">$2</a>", $message['MSG']);
+#20260601 gikoneko ttp -> http converted
+            $message['MSG'] = preg_replace("/[^h]((ttps?|ftp|news):\/\/[-_.,!~*'()a-zA-Z0-9;\/?:\@&=+\$,%#]+)/",
+                "<a href=\"h$1\" target=\"link\">$1</a>", $message['MSG']);
 
         # "Reference"
         if (!$mode) {
@@ -1068,7 +1164,21 @@ class Bbs extends Webapp {
 		$msgmore = str_replace(['{BINDEX}','{EINDEX}'], [$bindex,$eindex], T('POSTS_RANGE_NEWEST_TO_OLDEST'));
         }
         else {
-            $msgmore = T('NO_UNREAD_MESSAGES') . ' ';
+
+#20260719 Gikoneko: conf.php の GIKONEKO_TOISSHO（あり=1／なし=0）で
+#分岐できるようにした。旧処理（NO_UNREAD_MESSAGES表示）はGIKONEKO_TOISSHO=0の
+#場合のフォールバックとして残す。
+            if ($this->c['GIKONEKO_TOISSHO']) {
+require_once("./gikoneko.php");
+
+ob_start();
+giko_display();
+$msgmore = ob_get_clean();
+            }
+            else {
+                $msgmore = T('NO_UNREAD_MESSAGES') . ' ';
+            }
+
         }
         if ($eindex >= $lastindex) {
             $msgmore .= T('NO_POSTS_BELOW');
@@ -1106,10 +1216,32 @@ class Bbs extends Webapp {
      */
     function getdispmessage() {
 
-        $logdata = $this->loadmessage();
-        # Unread pointer (latest POSTID)
-        $items = @explode (',', $logdata[0], 3);
+        # 20260719 Gikoneko: one-pass streaming read (Func::fgetline) instead of
+        # loading the whole log via file(), to avoid holding LOGSAVE lines in
+        # memory when only a small display window is needed. array_splice()'s
+        # PHP-specific negative offset/length ("count from the end") semantics
+        # require knowing the total line count in advance, so that rare edge
+        # case (bindex<0, or eindex-bindex<0 before clamping) falls back to a
+        # cheap count-only pre-pass + a second targeted read. The normal case
+        # (bindex>=0 and eindex>=bindex) stays a true single pass.
+        $logfilename = $this->c['LOGFILENAME'];
+        #20260717 Gikoneko: auto-create the main log file on first run
+        if (!file_exists($logfilename) and $this->ensurefile($logfilename)) {
+            $this->prtfilecreated(array(sprintf(T('FILE_AUTOCREATED'), $logfilename)));
+        }
+        if (!file_exists($logfilename)) {
+            $this->prterror(T('FAILED_TO_READ_MESSAGE'));
+        }
+        $fh = @fopen($logfilename, "rb");
+        if (!$fh) {
+            $this->prterror(T('FAILED_TO_READ_MESSAGE'));
+        }
+
+        # Unread pointer (latest POSTID) -- only line 0 is needed for this
+        $firstline = Func::fgetline($fh);
+        $items = @explode (',', $firstline, 3);
         $toppostid = $items[1];
+
         # Number of posts displayed
         $msgdisp = Func::fixnumberstr(@$this->f['d']);
         if ($msgdisp === FALSE) {
@@ -1145,25 +1277,74 @@ class Bbs extends Webapp {
             $bindex = 0;
             $eindex = $toppostid - @$this->f['p'];
         }
-        # For the last page, truncate
-        $lastindex = count($logdata);
-        if ($eindex > $lastindex) {
-            $eindex = $lastindex;
-        }
         # Display posts -1
         if ($msgdisp < 0) {
             $bindex = 0;
             $eindex = 0;
         }
-        # Display messages
-        if ($bindex == 0 and $eindex == 0) {
+
+        # 20260717 Gikoneko: does resolving this window require knowing the
+        # total line count in advance? (true array_splice() would need it
+        # whenever the offset is negative, or the length is negative even
+        # before clamping to the actual total)
+        $needsEndCount = ($bindex < 0 or ($eindex - $bindex) < 0);
+
+        if ($needsEndCount) {
+            # Pre-pass: count remaining lines only, no storage (line 0 already read above)
+            $lastindex = ($firstline === FALSE) ? 0 : 1;
+            while (Func::fgetline($fh) !== FALSE) {
+                $lastindex++;
+            }
+            # Resolve the exact array_splice-equivalent [start, end) range
+            $offset = $bindex;
+            $start = ($offset >= 0) ? min($offset, $lastindex) : max($lastindex + $offset, 0);
+            if ($eindex > $lastindex) {
+                $eindex = $lastindex;
+            }
+            $lengthparam = $eindex - $bindex;
+            $end = ($lengthparam >= 0) ? min($start + $lengthparam, $lastindex) : max($lastindex + $lengthparam, $start);
+
+            # Second pass: re-open and read only the resolved [start, end) range
+            fclose($fh);
+            $fh = @fopen($logfilename, "rb");
+            if (!$fh) {
+                $this->prterror(T('FAILED_TO_READ_MESSAGE'));
+            }
             $logdatadisp = array();
+            $lineindex = 0;
+            while (($line = Func::fgetline($fh)) !== FALSE) {
+                if ($lineindex >= $start and $lineindex < $end) {
+                    $logdatadisp[] = $line;
+                }
+                $lineindex++;
+                if ($lineindex >= $end) {
+                    break;
+                }
+            }
+            fclose($fh);
         }
         else {
-            $logdatadisp = array_splice ($logdata, $bindex, ($eindex - $bindex));
-            if ($this->c['RELTYPE'] and (@$this->f['readnew'] or ($msgdisp == '0' and $bindex == 0))) {
-                $logdatadisp = array_reverse($logdatadisp);
+            # Normal case: single forward pass, buffer only [bindex, eindex)
+            $logdatadisp = array();
+            $lineindex = 0;
+            $line = $firstline;
+            while ($line !== FALSE) {
+                if ($lineindex >= $bindex and $lineindex < $eindex) {
+                    $logdatadisp[] = $line;
+                }
+                $lineindex++;
+                $line = Func::fgetline($fh);
             }
+            fclose($fh);
+            $lastindex = $lineindex;
+            # For the last page, truncate (mirrors original array_splice truncation)
+            if ($eindex > $lastindex) {
+                $eindex = $lastindex;
+            }
+        }
+
+        if ($this->c['RELTYPE'] and (@$this->f['readnew'] or ($msgdisp == '0' and $bindex == 0))) {
+            $logdatadisp = array_reverse($logdatadisp);
         }
         $this->s['TOPPOSTID'] = $toppostid;
         $this->s['MSGDISP'] = $msgdisp;
@@ -1210,12 +1391,21 @@ class Bbs extends Webapp {
                 $counter = $this->counter();
                 if (is_numeric($counter)) { $counter = number_format((int)$counter); }
                 $this->t->addVar("counter", 'COUNTER', $counter);
+                # 2026-07-17：{COUNTER_TEXT}の中に{COUNTDATE}等をネストして
+                # 埋め込んでいたが、patTemplateは一度置換した文字列を再度
+                # 走査しないため、sprintf()で先に文字列を完成させてから渡す。
+                # 2026-07-17: COUNTER_TEXT previously embedded nested
+                # {COUNTDATE}/{COUNTER}/{COUNTLEVEL} tokens, but patTemplate
+                # does not re-scan already-substituted text, so those never
+                # resolved. Build the final string with sprintf() first.
+                $this->t->addVar("counter", 'COUNTER_TEXT', sprintf(T('COUNTER_TEXT'), $this->c['COUNTDATE'], $counter, $this->c['COUNTLEVEL']));
                 $this->t->setAttribute("counter", "visibility", "visible");
             }
             if ($this->c['CNTFILENAME']) {
                 $mbrcount = $this->mbrcount();
                 if (is_numeric($mbrcount)) { $mbrcount = number_format((int)$mbrcount); }
                 $this->t->addVar("mbrcount", 'MBRCOUNT', $mbrcount);
+                $this->t->addVar("mbrcount", 'MBRCOUNT_TEXT', sprintf(T('MBRCOUNT_TEXT'), $mbrcount, $this->c['CNTLIMIT']));
                 $this->t->setAttribute("mbrcount", "visibility", "visible");
             }
             if (!$this->c['SHOW_COUNTER'] and !$this->c['CNTFILENAME']) {
@@ -1426,21 +1616,34 @@ class Bbs extends Webapp {
             fclose ($fh);
         }
         else {
-            $logdata = $this->loadmessage();
-            foreach ($logdata as $logline) {
-                $message = $this->getmessage($logline);
-                # Search by user
-                if ($mode == 's' and preg_replace("/<[^>]*>/", '', $message['USER']) == @$this->f['s']) {
-                    $result[] = $message;
-                }
-                # Search by thread
-                elseif ($mode == 't'
-                    and ($message['THREAD'] == @$this->f['s'] or $message['POSTID'] == @$this->f['s'])) {
-                    $result[] = $message;
-                    if ($message['POSTID'] == @$this->f['s']) {
-                        break;
+            # 20260719 Gikoneko: loadmessage()（file()で全件配列化）ではなく、
+            # "ff"分岐と同じFunc::fgetline()によるストリーム読みに統一。
+            # 全件を配列で保持しないため、ログが大きいほどメモリ削減効果が出る。
+            $logfilename = $this->c['LOGFILENAME'];
+            if (!file_exists($logfilename) and $this->ensurefile($logfilename)) {
+                $this->prtfilecreated(array(sprintf(T('FILE_AUTOCREATED'), $logfilename)));
+            }
+            if (!file_exists($logfilename)) {
+                $this->prterror(T('FAILED_TO_READ_MESSAGE'));
+            }
+            $fh2 = @fopen($logfilename, "rb");
+            if ($fh2) {
+                while (($logline = Func::fgetline($fh2)) !== FALSE) {
+                    $message = $this->getmessage($logline);
+                    # Search by user
+                    if ($mode == 's' and preg_replace("/<[^>]*>/", '', $message['USER']) == @$this->f['s']) {
+                        $result[] = $message;
+                    }
+                    # Search by thread
+                    elseif ($mode == 't'
+                        and ($message['THREAD'] == @$this->f['s'] or $message['POSTID'] == @$this->f['s'])) {
+                        $result[] = $message;
+                        if ($message['POSTID'] == @$this->f['s']) {
+                            break;
+                        }
                     }
                 }
+                fclose($fh2);
             }
         }
         return $result;
@@ -1669,16 +1872,16 @@ class Bbs extends Webapp {
             $this->prterror(T('POST_TOO_LARGE'));
         }
         if (strlen (@$this->f['u']) > $this->c['MAXNAMELENGTH']) {
-            $this->prterror(T('NAME_TOO_LONG'));
+            $this->prterror(sprintf(T('NAME_TOO_LONG'), $this->c['MAXNAMELENGTH']));
         }
         if (strlen (@$this->f['i']) > $this->c['MAXMAILLENGTH']) {
-            $this->prterror(T('EMAIL_TOO_LONG'));
+            $this->prterror(sprintf(T('EMAIL_TOO_LONG'), $this->c['MAXMAILLENGTH']));
         }
 //        if (@$this->f['i']) { ## mod
 //            $this->prterror(T('SPAM_KUN')); ## mod
 //        } ## mod
         if (strlen (@$this->f['t']) > $this->c['MAXTITLELENGTH']) {
-            $this->prterror(T('TITLE_TOO_LONG'));
+            $this->prterror(sprintf(T('TITLE_TOO_LONG'), $this->c['MAXTITLELENGTH']));
         }
         {
             $timestamp = Func::pcode_verify (@$this->f['pc'], $limithost);
@@ -2654,6 +2857,7 @@ class Func {
         }
         $datestr = date($format, $timestamp);
         if (strrpos($format, '-') !== FALSE) {
+            static $wdays;
             if (!isset($wdays)) {
                 $wdays = [ T('SUNDAY'), T('MONDAY'), T('TUESDAY'), T('WEDNESDAY'), T('THURSDAY'), T('FRIDAY'), T('SATURDAY') ];
             }
