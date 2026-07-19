@@ -27,15 +27,19 @@ $CONF = array(
 
   // ログファイル名
   // Log file name
-  'LOGFILENAME' => './bbs.log',
+  'LOGFILENAME' => './logs/bbs.log',
   
   //過去ログ保存用ディレクトリの名前（最後に/を入れてください。空の場合は過去ログを保存しません）
   // Name of the directory for storing logs (Please put a / at the end. If empty, logs will not be saved)
-  'OLDLOGFILEDIR' => './log/',
+  'OLDLOGFILEDIR' => './logs/log/',
 
   // 過去ログファイルのZIPアーカイブディレクトリ（最後に/を入れてください。空の場合かgzcompress関数が使用不可の場合はZIPアーカイブを作成しません）
   // ZIP archive directory for past log files (Please put a / at the end. If empty, or if gzcompress is unavailable, ZIP archives will not be created)
-  'ZIPDIR' => '',
+  'ZIPDIR' => './archive/',
+
+  // 擬古猫のことば（占い）データファイル（sub/ではなくgikoneko.php/gikonekoadd.phpで使用）
+  // Gikoneko fortune-message data file (used by gikoneko.php / gikonekoadd.php)
+  'GIKONEKO_KOTOBA_FILE' => './data/gikoneko_kotoba.dat',
 
   #------------------------------ 掲示板名称など ---------------------------------
   #------------------------- Bulletin board name, etc. -------------------------
@@ -44,11 +48,11 @@ $CONF = array(
   // * Bulletin board name
   ## TL note: Ayashii World titles usually take the form of "AyashiiWorld@[web host name]
   ## TL note: StrangeWorld@ is the common English way to start it
-  'BBSTITLE' => 'あやしいわーるど＠',
+  'BBSTITLE' => 'あやしいわーるど＠PHP+',
 
   // * 広報室のURL
   // * URL for the Public Relations Office (home/information page)
-  'INFOPAGE' => '/',
+  'INFOPAGE' => './',
 
   #------------------------------- 管理設定 ----------------------------------
   #------------------------- Administrator settings -------------------------
@@ -59,7 +63,7 @@ $CONF = array(
 
   // * 管理人のメールアドレス
   // * Administrator email address
-  'ADMINMAIL' => 'mail@example.com',
+  'ADMINMAIL' => 'admin@example.com',
   
   // * 管理用パスワード（暗号化パスワード。最初は空にしておいてください）
   // * Administor password (Encrypted password. Please leave this empty at first)
@@ -77,7 +81,7 @@ $CONF = array(
 
   // 検索エンジンに掲示板の概要を教えます。短い文章にするといいでしょう
   // Gives search engines an overview of the bulletin board. Keep it short and sweet
-  'META_DESCRIPTION' => '',
+  'META_DESCRIPTION' => 'あやしいわーるど＠',
 
   // 掲示板に関連した単語をカンマ区切りで入力します。あまり多すぎるとペナルティを食らう場合もあるようです
   // Enter some words related to the bulletin board, seperated by commas. If there's too many, you may be penalized by search engines
@@ -92,8 +96,9 @@ $CONF = array(
 
   // 掲示板ソフト全体の表示言語（UIやテンプレートの言語）を指定します。
   // Specifies the software’s display language (the language used for the UI and templates).
-  // Change to 'en' for English.
-  'TEMPLATE_LANGUAGE' => 'ja',
+  // 日本語：japanese
+  // English : english
+  'LANGUAGE_FILE' => 'japanese',
 
   #------------------------------ 動作設定 -------------------------------
   #------------------------- Operation settings -------------------------
@@ -110,7 +115,7 @@ $CONF = array(
   // Image upload function.
   #   0 : 無効 (Disabled)
   #   1 : 有効 (Enabled)
-  'BBSMODE_IMAGE' => 0,
+  'BBSMODE_IMAGE' => 1,
 
   // 管理者専用投稿モード（日記用）
   #   0 : 無効
@@ -136,6 +141,12 @@ $CONF = array(
   #   1 : 表示する (Display)
   'SHOW_READNEWBTN' => 1,
 
+  // 未読が0件のときに「擬古猫といっしょ」を表示するかどうか
+  // Whether to show "Gikoneko-to-issho" when there are no unread posts
+  #   0 : 表示しない (Disabled)
+  #   1 : 表示する (Enabled)
+  'GIKONEKO_TOISSHO' => 1,
+
   // gzip圧縮の初期値
   // （表示が高速化されます）
   // Default value for gzip compression
@@ -146,7 +157,7 @@ $CONF = array(
 
   // メッセージの保存数
   // Number of messages stored
-  'LOGSAVE' => 5000,
+  'LOGSAVE' => 99999,
 
   // １画面に表示するメッセージの表示数
   // Number of messages displayed on a single page
@@ -159,11 +170,11 @@ $CONF = array(
 
   // １メッセージの最大桁数
   // Maximum number of characters in a single message
-  'MAXMSGCOL' => 250,
+  'MAXMSGCOL' => 1000,
 
   // １メッセージの最大行数
   // Maximum number of lines in a single message
-  'MAXMSGLINE' => 120,
+  'MAXMSGLINE' => 1000,
 
   // 投稿者の最大文字数
   // Maximum number of characters in the name field
@@ -263,23 +274,23 @@ $CONF = array(
 
   // * カウンターのスタート日付
   // * Counter start date
-  'COUNTDATE' => '2025/11/09',
+  'COUNTDATE' => '2026/07/20',
 
   // カウンターのファイル名の先頭部分
   // First part of the counter's file name
-  'COUNTFILE' => './count/count',
+  'COUNTFILE' => './data/count/count',
 
   // カウンターの壊れにくさレベル
   #  (推奨値3～5 値が大きいほどエラーが発生しにくくなりますがサーバー負荷が大きくなります)
   // Counter breakage resistance level
   # (Values between 3-5 are recommended. The larger the value, the less likely the counter will be erroneous, but the greater the server load)
-  'COUNTLEVEL' => 5,
+  'COUNTLEVEL' => 3,
 
   // リアルタイム参加者カウント用ファイル名
   //  (リアルタイム参加者カウント機能を使用しない場合は空のままにしておきます)
   // File name for real-time participant counting
   //  (Leave it empty if you don't want to use the real-time participant counting function)
-  'CNTFILENAME' => './bbs.cnt',
+  'CNTFILENAME' => './data/bbs.cnt',
 
   // リアルタイム参加者カウント間隔 (秒)
   // （最終ページビューからこの時間を超えた参加者は集計から除外されます）
@@ -358,7 +369,7 @@ $CONF = array(
   // UNDO(自分が直前に投稿した記事のみ消去)ボタンに表示する文字
   // Text to be displayed on the UNDO (Delete only the last post you posted) button
   ## TL Note: You can set to 'Undo' for English instances
-  'TXTUNDO' => '消去',
+  'TXTUNDO' => '×',
 
   // フォロー投稿時に相手の投稿者名に付加する文字（一般の掲示板では「さん」などを付けると良いでしょう）
   // Text to be added to the other user's name when making a follow-up post (on a typical bulletin board it's best to use "-san" or something similar)
@@ -493,9 +504,79 @@ $CONF = array(
     'しぱ' => 'しば',
     'Fraudster' => 'Administrator',
     '騙り' => '管理人',
-    '騙り' => '管理入'
-
+    '驕り' => '管理入',
+    'しば' => 'shiba',
+    'テスト' => 'test'
   ),
+
+  #------------------------------------- 画像アップロード（sub/bbsimage.php） -------------------------------------
+  #------------------------- Image upload (sub/bbsimage.php) -------------------------
+
+  // 画像アップロード先ディレクトリ（書き込み可能にしてください）
+  // Image upload directory (please set it to be writable)
+  'UPLOADDIR' => './upload/',
+
+  // 最新アップロード画像番号を記録するファイル（書き込み可能にしてください）
+  // File containing latest image upload file number (please set it to be writable)
+  'UPLOADIDFILE' => './upload/id.txt',
+
+  // 投稿内容にこの文字列があれば、その位置にアップロード画像を挿入する
+  // If this string is present in the post content, the uploaded image will be inserted into that position
+  'IMAGETEXT' => '%image',
+
+  // アップロード画像用の総容量（KB）
+  // Total space dedicated to uploaded images (KB)
+  'MAX_UPLOADSPACE' => 10000,
+
+  // アップロード画像の最大幅
+  // Maximum width for uploaded images
+  'MAX_IMAGEWIDTH' => 1280,
+
+  // アップロード画像の最大高さ
+  // Maximum height for uploaded images
+  'MAX_IMAGEHEIGHT' => 1600,
+
+  // アップロード画像の最大ファイルサイズ（KB）
+  // Maximum file size for uploaded images (KB)
+  'MAX_IMAGESIZE' => 200,
+
+  // 掲示板表示時の画像縮小率（％）
+  // Image scale factor when displayed on the bulletin board (%)
+  'IMAGE_PREVIEW_RESIZE' => 100,
+
+  #------------------------------------- ツリー表示（sub/bbstree.php） -------------------------------------
+  #------------------------- Tree view (sub/bbstree.php) -------------------------
+
+  // 枝の色
+  // Branch color
+  'C_BRANCH' => '5ff',
+
+  // 更新時刻表示の色
+  // Update time display color
+  'C_UPDATE' => 'ccc',
+
+  // 新着メッセージの色
+  // New message color
+  'C_NEWMSG' => 'fca',
+
+  // ツリー表示件数
+  // Number of trees displayed
+  'TREEDISP' => 32,
+
+  #------------------------------------- ログ検索（sub/bbslog.php） -------------------------------------
+  #------------------------- Log search (sub/bbslog.php) -------------------------
+
+  // 複数の過去ログを横断検索できるようにするか
+  // Whether or not multiple logs can be searched
+  'MULTIPLESEARCH' => 1,
+
+  // 検索キーワードのハイライト色
+  // Search term highlight color
+  'C_QUERY' => 'FF8000',
+
+  // 検索できるキーワードの最大数
+  // Maximum number of keywords that can be searched
+  'MAXKEYWORDS' => 10,
 
   #------------------------------------- 詳細設定（通常は変更不要です） -------------------------------------
   #------------------------- Advanced settings (usually don't require changing) -------------------------
